@@ -292,7 +292,17 @@ export function handleExotelStream(ws, req) {
   let silenceCheckTimer = null;
   let echoMuteUntil = 0; // Timestamp to suppress echo while greeting is being sent
 
-  const VAD_RMS_THRESHOLD = parseInt(process.env.VAD_RMS_THRESHOLD || '250', 10);
+  const VAD_RMS_THRESHOLD = parseInt(process.env.VAD_RMS_THRESHOLD || '400', 10);
+
+  // Live conversational speech accumulator and VAD frame tracking
+  let accumulatedPcmChunks = [];
+  let isSpeaking = false;
+  let speechFramesCount = 0;
+  let silenceFramesCount = 0;
+  let isProcessingUtterance = false;
+  const MIN_SPEECH_FRAMES = 8;        // ~160ms of speech minimum
+  const SILENCE_FRAMES_TRIGGER = 25;  // ~500ms of trailing silence after speech
+  const MAX_SPEECH_FRAMES = 350;      // ~7s maximum speech before automatic processing
 
   // Helper to send a JSON event object to Exotel safely
   function sendEvent(eventObj) {
@@ -305,17 +315,70 @@ export function handleExotelStream(ws, req) {
     }
   }
 
-  // Helper to send synthesized audio back to Exotel in 20ms frames
-  function sendAudioInChunks(audioBuffer, sid, asMuLaw = false) {
-    if (!audioBuffer || !sid || ws.readyState !== ws.OPEN) return;
+  // Per-call outbound audio mutex chain: ensures responses never interleave
+  let outboundAudioChain = Promise.resolve();
+
+  // Helper to send synthesized audio back to Exotel paced in real-time chunks
+  async function sendAudioInChunks(audioBuffer, sid, asMuLaw = false) {
+    if (!audioBuffer || !sid) return 0;
+
+    // Mutex queue per call: ensure prior audio completes before next starts
+    const prevChain = outboundAudioChain;
+    let releaseLock;
+    outboundAudioChain = new Promise((resolve) => {
+      releaseLock = resolve;
+    });
 
     try {
-      const payloadBuffer = asMuLaw ? (prewarmedGreetingMulaw8k && audioBuffer === prewarmedGreetingPcm8k ? prewarmedGreetingMulaw8k : pcm16ToMulaw(audioBuffer)) : audioBuffer;
-      // Frame size: 160 bytes for 8kHz mu-law (20ms), 320 bytes for 8kHz 16-bit PCM (20ms)
-      const FRAME_SIZE = asMuLaw ? 160 : 320;
+      await prevChain;
+    } catch {
+      // Continue even if previous dispatch had an error
+    }
 
-      for (let offset = 0; offset < payloadBuffer.length; offset += FRAME_SIZE) {
-        const chunk = payloadBuffer.subarray(offset, Math.min(offset + FRAME_SIZE, payloadBuffer.length));
+    try {
+      return await _sendAudioInChunksInternal(audioBuffer, sid, asMuLaw);
+    } finally {
+      releaseLock();
+    }
+  }
+
+  async function _sendAudioInChunksInternal(audioBuffer, sid, asMuLaw = false) {
+    if (!audioBuffer || !sid || ws.readyState !== ws.OPEN) {
+      if (ws.readyState !== ws.OPEN) {
+        console.warn(`[ExotelStream:Outbound] Audio dispatch aborted: WebSocket not open (state=${ws.readyState})`);
+      }
+      return 0;
+    }
+
+    try {
+      const payloadBuffer = asMuLaw
+        ? (prewarmedGreetingMulaw8k && audioBuffer === prewarmedGreetingPcm8k
+            ? prewarmedGreetingMulaw8k
+            : pcm16ToMulaw(audioBuffer))
+        : audioBuffer;
+
+      if (!payloadBuffer || payloadBuffer.length === 0) return 0;
+
+      // 3200 bytes for 8kHz 16-bit PCM (200ms, aligned to 320-byte boundaries)
+      // 1600 bytes for 8kHz 8-bit μ-law (200ms, aligned to 160-byte boundaries)
+      const CHUNK_SIZE = asMuLaw ? 1600 : 3200;
+      const bytesPerMs = asMuLaw ? 8 : 16;
+      const durationMs = Math.ceil(payloadBuffer.length / bytesPerMs);
+
+      // Keep echoMuteUntil updated so line echo is suppressed while audio plays out
+      echoMuteUntil = Math.max(echoMuteUntil, Date.now() + durationMs + 80);
+
+      const totalChunks = Math.ceil(payloadBuffer.length / CHUNK_SIZE);
+      let chunksDispatched = 0;
+
+      for (let offset = 0; offset < payloadBuffer.length; offset += CHUNK_SIZE) {
+        if (ws.readyState !== ws.OPEN) {
+          console.warn(`[ExotelStream:Outbound] WebSocket closed during outbound audio (${chunksDispatched}/${totalChunks} chunks sent). Audio interrupted.`);
+          break;
+        }
+
+        const chunk = payloadBuffer.subarray(offset, Math.min(offset + CHUNK_SIZE, payloadBuffer.length));
+
         sendEvent({
           event: 'media',
           stream_sid: sid,
@@ -323,17 +386,78 @@ export function handleExotelStream(ws, req) {
             payload: chunk.toString('base64')
           }
         });
+        chunksDispatched++;
+
+        // After each non-final outbound chunk, wait approximately 200ms before sending the next chunk
+        if (offset + CHUNK_SIZE < payloadBuffer.length) {
+          const chunkDurationMs = Math.round(chunk.length / bytesPerMs);
+          await new Promise((resolve) => setTimeout(resolve, chunkDurationMs));
+        }
       }
 
-      // Compute playback duration to suppress line echo while audio plays
-      const durationMs = Math.ceil(payloadBuffer.length / (asMuLaw ? 8 : 16));
-      echoMuteUntil = Date.now() + durationMs + 80;
-      console.log(`[ExotelStream:Outbound] Dispatched ${payloadBuffer.length} bytes audio (~${Math.round(durationMs)}ms) in ${FRAME_SIZE}-byte frames`);
-
+      console.log(`[ExotelStream:Outbound] Sent ${payloadBuffer.length} bytes (~${Math.round(durationMs)}ms) in ${CHUNK_SIZE}-byte frames`);
       return durationMs;
     } catch (err) {
-      console.error('[ExotelStream] Error sending audio chunks to Exotel:', err.message);
+      console.error('[ExotelStream:Outbound] Error sending audio chunks to Exotel:', err.message);
       return 0;
+    }
+  }
+
+  // Process accumulated caller speech into text and trigger deterministic AI turn
+  async function processAccumulatedSpeech() {
+    if (accumulatedPcmChunks.length === 0 || isProcessingUtterance || !currentSession || currentSession._isFinalized) return;
+    isProcessingUtterance = true;
+    isSpeaking = false;
+
+    const fullPcm = Buffer.concat(accumulatedPcmChunks);
+    accumulatedPcmChunks = [];
+    speechFramesCount = 0;
+    silenceFramesCount = 0;
+
+    console.log(`[ExotelStream:VAD] Speech utterance captured: ${fullPcm.length} bytes (~${Math.round(fullPcm.length / 16)}ms)`);
+
+    try {
+      const stt = getSTTProvider();
+      const wavBuffer = createWav(fullPcm, sampleRate, 1);
+      const transcription = await stt.transcribe(wavBuffer, currentSession.language);
+
+      if (transcription && transcription.trim()) {
+        console.log(`[ExotelStream:STT] Caller: "${transcription.trim()}"`);
+
+        const result = await currentSession.processUtterance(transcription.trim(), emergencyService);
+        console.log(`[ExotelStream:AI] Stage: ${result.stage}, Reply: "${result.replyText}"`);
+
+        // Stream AI response audio back to caller
+        if (result.audioBuffer) {
+          await sendAudioInChunks(result.audioBuffer, streamSid, isMuLaw);
+        }
+
+        // Broadcast live progress to dashboard
+        eventBus.broadcast('CALL_UPDATED', {
+          id: currentSession.id,
+          callSid,
+          stage: currentSession.stage,
+          status: currentSession.status,
+          language: currentSession.language,
+          lastUtterance: transcription.trim(),
+          lastReply: result.replyText,
+          requestId: result.requestId
+        });
+
+        // If conversation reached completion (submission confirmed)
+        if (result.status === 'COMPLETED') {
+          const playDuration = result.audioBuffer
+            ? Math.ceil(result.audioBuffer.length / (isMuLaw ? 8 : 16))
+            : 0;
+          setTimeout(() => {
+            finalizeCall('conversation_completed');
+          }, playDuration + 1000);
+        }
+      }
+    } catch (err) {
+      console.warn('[ExotelStream] Error processing accumulated speech:', err.message);
+    } finally {
+      isProcessingUtterance = false;
     }
   }
 
@@ -470,7 +594,7 @@ export function handleExotelStream(ws, req) {
           }
 
           if (greetingAudio && greetingAudio.length > 0) {
-            const durationMs = sendAudioInChunks(greetingAudio, streamSid, isMuLaw);
+            const durationMs = await sendAudioInChunks(greetingAudio, streamSid, isMuLaw);
             echoMuteUntil = Date.now() + durationMs + 80;
             console.log(`[ExotelStream:Greeting] Delivering greeting message in 0ms: "${GREETING_TEXT}" (~${Math.round(durationMs)}ms)`);
 
@@ -489,7 +613,7 @@ export function handleExotelStream(ws, req) {
                 currentSession.recordingStartedAt = recordingStartedAt;
                 console.log(`[ExotelStream:Recording] >>> GREETING FINISHED. AUTOMATIC RECORDING STARTED FOR CALL ${callSid} <<<`);
               }
-            }, durationMs + 80);
+            }, 250);
           } else {
             // Immediate fallback to recording if no audio synthesized
             isRecordingActive = true;
@@ -535,11 +659,28 @@ export function handleExotelStream(ws, req) {
             // Capture caller's complete voice conversation until call ends!
             allCallerAudioChunks.push(pcmChunk);
 
-            // Track caller speech activity (non-blocking)
+            // Track caller speech activity and accumulate speech frames for live conversation
             const rms = calculateRms(pcmChunk);
             if (rms > VAD_RMS_THRESHOLD) {
               hasCallerSpoken = true;
               lastSpeechTimestamp = Date.now();
+              isSpeaking = true;
+              speechFramesCount++;
+              silenceFramesCount = 0;
+              accumulatedPcmChunks.push(pcmChunk);
+
+              if (speechFramesCount >= MAX_SPEECH_FRAMES && !isProcessingUtterance) {
+                await processAccumulatedSpeech();
+              }
+            } else {
+              if (isSpeaking) {
+                silenceFramesCount++;
+                accumulatedPcmChunks.push(pcmChunk);
+
+                if (silenceFramesCount >= SILENCE_FRAMES_TRIGGER && speechFramesCount >= MIN_SPEECH_FRAMES && !isProcessingUtterance) {
+                  await processAccumulatedSpeech();
+                }
+              }
             }
           } catch (mediaErr) {
             console.warn('[ExotelStream] Error processing media chunk:', mediaErr.message);
@@ -598,7 +739,7 @@ export function handleExotelStream(ws, req) {
           const result = await currentSession.processUtterance(callerText, emergencyService);
 
           if (result.audioBuffer) {
-            sendAudioInChunks(result.audioBuffer, streamSid, isMuLaw);
+            await sendAudioInChunks(result.audioBuffer, streamSid, isMuLaw);
           }
 
           sendEvent({
@@ -622,6 +763,9 @@ export function handleExotelStream(ws, req) {
           console.log(`[ExotelStream] STOP event received for call_sid=${callSid}`);
           if (message.recording_url || message.stop?.recording_url || message.RecordingUrl) {
             exotelRecordingUrl = message.recording_url || message.stop?.recording_url || message.RecordingUrl;
+          }
+          if (accumulatedPcmChunks.length > 0 && speechFramesCount >= MIN_SPEECH_FRAMES && !isProcessingUtterance) {
+            await processAccumulatedSpeech();
           }
           finalizeCall('stop_event');
           break;

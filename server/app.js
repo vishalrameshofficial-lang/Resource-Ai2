@@ -17,6 +17,7 @@ import authRouter from './routes/auth.js';
 import exotelRouter from './routes/exotel.js';
 import voiceRouter from './routes/voice.js';
 import governmentRouter from './routes/government.js';
+import geocodeRouter from './routes/geocode.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,6 +50,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/exotel', exotelRouter);
 app.use('/api/voice', voiceRouter);
 app.use('/api/government', governmentRouter);
+app.use('/api/geocode', geocodeRouter);
 
 // 5. Server-Sent Events (SSE) for Real-Time Dashboard Updates
 app.get('/api/events', (req, res) => {

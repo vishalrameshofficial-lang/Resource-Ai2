@@ -205,5 +205,22 @@ export const api = {
       headers: getAuthHeaders()
     });
     return res.json();
+  },
+
+  // Geocoding
+  async geocodeRequest(id: string) {
+    const res = await fetch(`${API_BASE}/geocode/request/${id}`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  async geocodeBatch() {
+    const res = await fetch(`${API_BASE}/geocode/batch`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    return res.json();
   }
 };

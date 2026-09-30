@@ -11,14 +11,20 @@ export const CONVERSATION_STAGES = {
 
 export const MULTILINGUAL_STRINGS = {
   English: {
-    greeting: "Hi, I’m Resource AI. Tell me your query.",
+    greeting: "Hello, I’m Resource AI. Please tell me your emergency.",
     askEmergency: "What is the emergency?",
-    askLocation: "Where is the emergency happening?",
+    askLocation: "Where is it happening?",
     askPeople: "How many people are affected?",
     askResources: "What help or resources do you need?",
-    confirmation: (loc, count, res) => `I have the emergency at ${loc}, affecting ${count} people, and requiring ${res}. Is that correct?`,
+    confirmation: (loc, count, res, cat) => {
+      const catText = cat ? `${cat.toLowerCase() === 'flood' ? 'flooding' : cat.toLowerCase()} ` : '';
+      const numWordMap = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 10: 'ten' };
+      const countText = numWordMap[count] || count;
+      return `You reported ${catText}in ${loc} affecting ${countText} people and needing ${res}. Is that correct?`;
+    },
     recorded: (reqId) => `Thank you. Your emergency request has been recorded in ResourceAI. Your request ID is ${reqId}. Our operations team will process this for relief coordination.`,
-    clarify: "Please say yes to confirm, or tell me the correct details.",
+    clarify: "Please say yes to confirm, or tell me what to correct.",
+    clarifyCorrection: "What should I correct?",
     safetyRuleReminder: "Your emergency details are recorded in ResourceAI. Please move to higher ground or a secure location if safe to do so."
   },
   Tamil: {

@@ -277,6 +277,7 @@ function AppContent() {
                     <EmergencyMap
                       requests={requests.slice(0, 10)}
                       onSelectRequest={(r) => setSelectedRequest(r)}
+                      fullView={false}
                     />
                   </div>
                 </div>
@@ -346,23 +347,11 @@ function AppContent() {
           {/* TAB 4: DISASTER MAP */}
           {activeTab === 'map' && (
             <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-120px)] flex flex-col">
-              <div className="flex items-center justify-between shrink-0">
-                <div>
-                  <h2 className="text-xl font-extrabold text-white">
-                    Geographic Disaster Map
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Real-time geo-located emergency incident clusters and relief distribution points.
-                  </p>
-                </div>
-                <span className="text-xs text-slate-400 font-mono">
-                  {requests.filter((r) => r.latitude).length} Geo-tagged Incidents
-                </span>
-              </div>
               <div className="flex-1 min-h-[500px]">
                 <EmergencyMap
                   requests={requests}
                   onSelectRequest={(r) => setSelectedRequest(r)}
+                  fullView={true}
                 />
               </div>
             </div>

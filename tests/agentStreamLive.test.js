@@ -170,8 +170,11 @@ test('Exotel AgentStream WebSocket - Complete Call Lifecycle & Database Persiste
     }
   }));
 
-  // Wait for initial greeting media chunks and mark
-  await new Promise((r) => setTimeout(r, 600));
+  // Wait for initial greeting media chunks and mark to complete async real-time pacing
+  for (let i = 0; i < 30; i++) {
+    if (receivedEvents.some(e => e.event === 'mark' && e.stream_sid === testStreamSid)) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
 
   // If speech provider succeeds (or mock), verify media chunks and mark
   const hasMedia = receivedEvents.some(e => e.event === 'media' && e.stream_sid === testStreamSid);
@@ -187,7 +190,10 @@ test('Exotel AgentStream WebSocket - Complete Call Lifecycle & Database Persiste
     text: 'There is severe flooding near Tirunelveli railway station and 25 people need food and water'
   }));
 
-  await new Promise((r) => setTimeout(r, 600));
+  for (let i = 0; i < 30; i++) {
+    if (receivedEvents.some(e => e.event === 'test_response' && e.stream_sid === testStreamSid)) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
 
   // 4. Send Exotel 'stop' event to conclude call
   ws.send(JSON.stringify({
