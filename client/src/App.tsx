@@ -6,7 +6,6 @@ import {
   PhoneCall,
   Users,
   CheckCircle,
-  Truck,
   Building2,
   RefreshCw,
   Bell
@@ -31,8 +30,15 @@ import { ExotelConfigGuide } from './components/voice/ExotelConfigGuide';
 import { CitizenIntakeForm } from './components/citizen/CitizenIntakeForm';
 import { SettingsView } from './components/settings/SettingsView';
 
+// Government Operations Platform Components
+import { CommandCenterView } from './components/commandCenter/CommandCenterView';
+import { EducationDashboardView } from './components/education/EducationDashboardView';
+import { HealthDashboardView } from './components/health/HealthDashboardView';
+import { AuditLogsView } from './components/audit/AuditLogsView';
+import { ReportsView } from './components/reports/ReportsView';
+
 function AppContent() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('command-center');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [requests, setRequests] = useState<EmergencyRequest[]>([]);
   const [activeCalls, setActiveCalls] = useState<ActiveLiveCall[]>([]);
@@ -40,7 +46,7 @@ function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState<string | null>(null);
 
-  // Load all dashboard data
+  // Load all emergency dashboard data
   const fetchData = useCallback(async () => {
     try {
       const [statsData, reqsData, callsData] = await Promise.all([
@@ -71,7 +77,6 @@ function AppContent() {
         const newReq: EmergencyRequest = event.data;
         setRequests((prev) => [newReq, ...prev.filter((r) => r.id !== newReq.id)]);
         setNotification(`🚨 NEW EMERGENCY: ${newReq.request_id} recorded in ${newReq.location}!`);
-        // Refresh stats
         api.getStats().then(setStats);
       } else if (event.type === 'REQUEST_UPDATED') {
         const updatedReq: EmergencyRequest = event.data;
@@ -139,11 +144,16 @@ function AppContent() {
         />
 
         {/* Central Content Area */}
-        <main className="flex-1 p-6 overflow-y-auto max-h-[calc(100vh-61px)]">
-          {/* TAB 1: DASHBOARD */}
+        <main className="flex-1 p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
+          {/* TAB 0: GOVERNMENT COMMAND CENTER */}
+          {activeTab === 'command-center' && (
+            <CommandCenterView onNavigateTab={(tab: string) => setActiveTab(tab)} />
+          )}
+
+          {/* TAB 1: EMERGENCY RESPONSE DASHBOARD */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6 max-w-7xl mx-auto">
-              {/* Prominent Emergency Hotline Banner with Call Emergency Support Button */}
+              {/* Prominent Emergency Hotline Banner */}
               <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-950/70 via-slate-900/90 to-blue-950/70 border border-red-500/40 shadow-xl shadow-red-950/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center space-x-3.5">
                   <div className="relative">
@@ -162,7 +172,7 @@ function AppContent() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-300 mt-0.5">
-                      Immediate multilingual voice assistance for stranded citizens and rescue teams.
+                      Immediate multilingual voice assistance for stranded citizens and emergency teams.
                     </p>
                   </div>
                 </div>
@@ -346,7 +356,7 @@ function AppContent() {
 
           {/* TAB 4: DISASTER MAP */}
           {activeTab === 'map' && (
-            <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-120px)] flex flex-col">
+            <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col">
               <div className="flex-1 min-h-[500px]">
                 <EmergencyMap
                   requests={requests}
@@ -368,21 +378,41 @@ function AppContent() {
             </div>
           )}
 
-          {/* TAB 6: TELEPHONY & EXOTEL INTEGRATION */}
+          {/* TAB 6: EDUCATION RESOURCE ALLOCATION (INDEPENDENT DOMAIN) */}
+          {activeTab === 'education' && (
+            <EducationDashboardView />
+          )}
+
+          {/* TAB 7: HEALTH RESOURCE ALLOCATION (INDEPENDENT DOMAIN) */}
+          {activeTab === 'health-resources' && (
+            <HealthDashboardView />
+          )}
+
+          {/* TAB 8: AUDIT TRAIL */}
+          {activeTab === 'audit-logs' && (
+            <AuditLogsView />
+          )}
+
+          {/* TAB 9: REPORTS */}
+          {activeTab === 'reports' && (
+            <ReportsView />
+          )}
+
+          {/* TAB 10: TELEPHONY & EXOTEL INTEGRATION */}
           {activeTab === 'simulator' && (
             <div className="space-y-6 max-w-7xl mx-auto">
               <ExotelConfigGuide />
             </div>
           )}
 
-          {/* TAB 7: CITIZEN INTAKE PORTAL */}
+          {/* TAB 11: CITIZEN INTAKE PORTAL */}
           {activeTab === 'citizen' && (
             <div className="max-w-7xl mx-auto">
               <CitizenIntakeForm />
             </div>
           )}
 
-          {/* TAB 8: SETTINGS & ARCHITECTURE */}
+          {/* TAB 12: SETTINGS & ARCHITECTURE */}
           {activeTab === 'settings' && (
             <div className="max-w-7xl mx-auto">
               <SettingsView />
@@ -391,7 +421,7 @@ function AppContent() {
         </main>
       </div>
 
-      {/* Request Detail Modal */}
+      {/* Emergency Request Detail Modal */}
       {selectedRequest && (
         <RequestDetailModal
           request={selectedRequest}

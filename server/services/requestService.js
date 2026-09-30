@@ -101,12 +101,14 @@ export class RequestService {
         id, created_at, updated_at, request_id, caller_name, caller_phone,
         caller_language, emergency_category, description, location, landmark,
         latitude, longitude, affected_people_count, resources_needed, urgency,
-        immediate_danger, source, status, admin_notes, government_reference, created_from_call_id
+        immediate_danger, source, status, admin_notes, government_reference, created_from_call_id,
+        detected_language, language_confidence, detected_at, original_transcript, english_translation
       ) VALUES (
         ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?
       )
     `);
 
@@ -132,7 +134,12 @@ export class RequestService {
       'NEW',
       null,
       null,
-      data.created_from_call_id || null
+      data.created_from_call_id || null,
+      data.detected_language || normalized.caller_language || 'English',
+      data.language_confidence || 0.85,
+      data.detected_at || now,
+      data.original_transcript || null,
+      data.english_translation || null
     );
 
     // Initial timeline record

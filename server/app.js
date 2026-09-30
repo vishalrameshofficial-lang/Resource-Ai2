@@ -18,6 +18,11 @@ import exotelRouter from './routes/exotel.js';
 import voiceRouter from './routes/voice.js';
 import governmentRouter from './routes/government.js';
 import geocodeRouter from './routes/geocode.js';
+import educationRouter from './routes/education.js';
+import healthResourcesRouter from './routes/healthResources.js';
+import commandCenterRouter from './routes/commandCenter.js';
+import auditLogsRouter from './routes/auditLogs.js';
+import reportsRouter from './routes/reports.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -51,6 +56,11 @@ app.use('/api/exotel', exotelRouter);
 app.use('/api/voice', voiceRouter);
 app.use('/api/government', governmentRouter);
 app.use('/api/geocode', geocodeRouter);
+app.use('/api/education', educationRouter);
+app.use('/api/health-resources', healthResourcesRouter);
+app.use('/api/command-center', commandCenterRouter);
+app.use('/api/audit-logs', auditLogsRouter);
+app.use('/api/reports', reportsRouter);
 
 // 5. Server-Sent Events (SSE) for Real-Time Dashboard Updates
 app.get('/api/events', (req, res) => {

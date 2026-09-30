@@ -110,6 +110,66 @@ export const MULTILINGUAL_STRINGS = {
     recorded: (reqId) => `ଧନ୍ୟବାଦ। ଆପଣଙ୍କ ଜରୁରୀ ଅନୁରୋଧ ResourceAI ରେ ଲିପିବଦ୍ଧ ହୋଇଛି। ଆପଣଙ୍କ ଅନୁରୋଧ ଆଇଡି ${reqId}।`,
     clarify: "ନିଶ୍ଚିତ କରିବାକୁ ହଁ କୁହନ୍ତୁ।",
     safetyRuleReminder: "ନିରାପଦ ସ୍ଥାନରେ ରୁହନ୍ତୁ।"
+  },
+  Marathi: {
+    greeting: "नमस्कार, ResourceAI आपत्कालीन मदत सेवा. काय अडचण आहे ते सांगा.",
+    askEmergency: "काय अडचण किंवा आपत्ती आहे ते सांगा.",
+    askLocation: "आपण कुठे आहात किंवा जवळची खूण काय आहे?",
+    askPeople: "अंदाजे किती लोक अडकले आहेत किंवा बाधित आहेत?",
+    askResources: "आपल्याला कोणती मदत किंवा सामग्री हवी आहे?",
+    askUrgency: "तात्काळ धोका आहे का?",
+    confirmation: (loc, count, res) => `ठिकाण: ${loc}, बाधित: ${count} लोक, गरज: ${res}. हे बरोबर आहे का?`,
+    recorded: (reqId) => `धन्यवाद. आपली आपत्कालीन नोंद ResourceAI प्रणालीमध्ये झाली आहे. आपला नोंदणी क्रमांक ${reqId} आहे.`,
+    clarify: "खात्री करण्यासाठी हो म्हणा किंवा दुरुस्ती सांगा.",
+    safetyRuleReminder: "कृपया सुरक्षित ठिकाणी जा."
+  },
+  Gujarati: {
+    greeting: "નમસ્તે, ResourceAI આપત્તિ સહાય. શું સમસ્યા છે તે જણાવો.",
+    askEmergency: "શું સમસ્યા કે આપત્તિ છે તે જણાવો.",
+    askLocation: "તમારું સ્થળ અથવા નજીકની ઓળખ જણાવો?",
+    askPeople: "કેટલા લોકો પ્રભાવિત થયા છે?",
+    askResources: "તમને કઈ સહાય કે સામગ્રી જોઈએ છે?",
+    askUrgency: "શું તાત્કાલિક જોખમ છે?",
+    confirmation: (loc, count, res) => `સ્થળ: ${loc}, ${count} લોકો, જરૂરિયાત: ${res}. શું આ સાચું છે?`,
+    recorded: (reqId) => `આભાર. તમારી આપત્તિ વિનંતી ResourceAI માં નોંધાઈ ગઈ છે. તમારો વિનંતી નંબર ${reqId} છે.`,
+    clarify: "ખાતરી કરવા માટે હા કહો.",
+    safetyRuleReminder: "સુરક્ષિત સ્થાને રહો."
+  },
+  Punjabi: {
+    greeting: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ResourceAI ਐਮਰਜੈਂਸੀ ਸੇਵਾ। ਕੀ ਮੁਸ਼ਕਲ ਹੈ ਦੱਸੋ।",
+    askEmergency: "ਕੀ ਐਮਰਜੈਂਸੀ ਜਾਂ ਮੁਸ਼ਕਲ ਹੈ ਦੱਸੋ।",
+    askLocation: "ਆਪਣੀ ਜਗ੍ਹਾ ਜਾਂ ਨੇੜਲਾ ਕੋਈ ਨਿਸ਼ਾਨ ਦੱਸੋ?",
+    askPeople: "ਕਿੰਨੇ ਲੋਕ ਫਸੇ ਜਾਂ ਪ੍ਰਭਾਵਿਤ ਹਨ?",
+    askResources: "ਤੁਹਾਨੂੰ ਕਿਸ ਮਦਦ ਜਾਂ ਸਮੱਗਰੀ ਦੀ ਲੋੜ ਹੈ?",
+    askUrgency: "ਕੀ ਤੁਰੰਤ ਕੋਈ ਖ਼ਤਰਾ ਹੈ?",
+    confirmation: (loc, count, res) => `ਜਗ੍ਹਾ: ${loc}, ${count} ਲੋਕ, ਲੋੜ: ${res}। ਕੀ ਇਹ ਠੀਕ ਹੈ?`,
+    recorded: (reqId) => `ਧੰਨਵਾਦ। ਤੁਹਾਡੀ ਬੇਨਤੀ ResourceAI ਵਿੱਚ ਦਰਜ ਹੋ ਗਈ ਹੈ। ਤੁਹਾਡਾ ਬੇਨਤੀ ਨੰਬਰ ${reqId} ਹੈ।`,
+    clarify: "ਪੁਸ਼ਟੀ ਲਈ ਹਾਂ ਕਹੋ।",
+    safetyRuleReminder: "ਸੁਰੱਖਿਅਤ ਥਾਂ 'ਤੇ ਰਹੋ।"
+  },
+  Assamese: {
+    greeting: "নমস্কাৰ, ResourceAI জৰুৰীকালীন সাহায্য সেৱা। কি বিপদ হৈছে কওক।",
+    askEmergency: "কি বিপদ বা জৰুৰীকালীন অৱস্থা হৈছে কওক।",
+    askLocation: "আপোনাৰ বৰ্তমান স্থান বা ওচৰৰ চিহ্ন কওক?",
+    askPeople: "কিমান মানুহ ক্ষতিগ্ৰস্ত হৈছে?",
+    askResources: "আপোনাক কি সহায় বা সামগ্ৰী লাগে?",
+    askUrgency: "তাত্ক্ষণিক বিপদ আছে নেকি?",
+    confirmation: (loc, count, res) => `স্থান: ${loc}, ${count} জন মানুহ, প্ৰয়োজন: ${res}। সঠিক নে?`,
+    recorded: (reqId) => `ধন্যবাদ। আপোনাৰ জৰুৰী অনুৰোধ ResourceAI ত পঞ্জীয়ন কৰা হৈছে। অনুৰোধ নম্বৰ ${reqId}।`,
+    clarify: "নিশ্চিত কৰিবলৈ হয় কওক।",
+    safetyRuleReminder: "সুৰক্ষিত স্থানত থাকক।"
+  },
+  Urdu: {
+    greeting: "آداب، ResourceAI ایمرجنسی سروس۔ آپ کو کیا پریشانی ہے؟",
+    askEmergency: "کیا ایمرجنسی ہے بتائیں؟",
+    askLocation: "آپ کا مقام یا قریبی نشانی کیا ہے؟",
+    askPeople: "کتنے افراد متاثر ہیں؟",
+    askResources: "آپ کو کس قسم کی مدد یا سامان درکار ہے؟",
+    askUrgency: "کیا فوری خطرہ ہے؟",
+    confirmation: (loc, count, res) => `مقام: ${loc}، متاثرین: ${count} افراد، ضرورت: ${res}۔ کیا یہ درست ہے؟`,
+    recorded: (reqId) => `شکریہ۔ آپ کی ایمرجنسی درخواست ResourceAI میں درج کر لی گئی ہے۔ آپ کا درخواست نمبر ${reqId} ہے۔`,
+    clarify: "تصدیق کے لیے ہاں کہیں۔",
+    safetyRuleReminder: "براہ کرم محفوظ مقام پر منتقل ہو جائیں۔"
   }
 };
 

@@ -222,5 +222,266 @@ export const api = {
       headers: getAuthHeaders()
     });
     return res.json();
+  },
+
+  // ─────────────────────────────────────────────
+  // Command Center
+  // ─────────────────────────────────────────────
+  async getCommandCenterStats() {
+    const res = await fetch(`${API_BASE}/command-center/stats`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  // ─────────────────────────────────────────────
+  // Education Resources API
+  // ─────────────────────────────────────────────
+  async getEducationStats() {
+    const res = await fetch(`${API_BASE}/education/stats`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getEducationRequests(params: Record<string, string | number> = {}) {
+    const query = new URLSearchParams(params as any).toString();
+    const res = await fetch(`${API_BASE}/education/requests?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json;
+  },
+
+  async getEducationRequestById(id: string) {
+    const res = await fetch(`${API_BASE}/education/requests/${id}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async createEducationRequest(data: any) {
+    const res = await fetch(`${API_BASE}/education/requests`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to submit request');
+    return json.data;
+  },
+
+  async updateEducationRequestStatus(id: string, statusOrData: string | any, details: any = {}) {
+    const payload = typeof statusOrData === 'object' ? statusOrData : { status: statusOrData, ...details };
+    const res = await fetch(`${API_BASE}/education/requests/${id}/status`, {
+      method: 'PATCH',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to update status');
+    return json.data;
+  },
+
+  async allocateEducationResource(id: string, allocationData: any) {
+    const res = await fetch(`${API_BASE}/education/requests/${id}/allocate`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(allocationData)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to allocate resource');
+    return json.data;
+  },
+
+  async getEducationAllocations(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/education/allocations?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createEducationAllocation(allocationData: any) {
+    const id = allocationData.request_id;
+    return this.allocateEducationResource(id, allocationData);
+  },
+
+  async getEducationInstitutions(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/education/institutions?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createEducationInstitution(data: any) {
+    const res = await fetch(`${API_BASE}/education/institutions`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to create institution');
+    return json.data;
+  },
+
+  async getEducationResources(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/education/resources?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createEducationResource(data: any) {
+    const res = await fetch(`${API_BASE}/education/resources`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to add inventory item');
+    return json.data;
+  },
+
+  // ─────────────────────────────────────────────
+  // Health Resources API
+  // ─────────────────────────────────────────────
+  async getHealthStats() {
+    const res = await fetch(`${API_BASE}/health-resources/stats`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getHealthRequests(params: Record<string, string | number> = {}) {
+    const query = new URLSearchParams(params as any).toString();
+    const res = await fetch(`${API_BASE}/health-resources/requests?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || json;
+  },
+
+  async getHealthRequestById(id: string) {
+    const res = await fetch(`${API_BASE}/health-resources/requests/${id}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async createHealthRequest(data: any) {
+    const res = await fetch(`${API_BASE}/health-resources/requests`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to submit health request');
+    return json.data;
+  },
+
+  async updateHealthRequestStatus(id: string, statusOrData: string | any, details: any = {}) {
+    const payload = typeof statusOrData === 'object' ? statusOrData : { status: statusOrData, ...details };
+    const res = await fetch(`${API_BASE}/health-resources/requests/${id}/status`, {
+      method: 'PATCH',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to update health request status');
+    return json.data;
+  },
+
+  async allocateHealthResource(id: string, allocationData: any) {
+    const res = await fetch(`${API_BASE}/health-resources/requests/${id}/allocate`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(allocationData)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to allocate health resource');
+    return json.data;
+  },
+
+  async getHealthAllocations(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/health-resources/allocations?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createHealthAllocation(allocationData: any) {
+    const id = allocationData.request_id;
+    return this.allocateHealthResource(id, allocationData);
+  },
+
+  async getHealthFacilities(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/health-resources/facilities?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createHealthFacility(data: any) {
+    const res = await fetch(`${API_BASE}/health-resources/facilities`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to create facility');
+    return json.data;
+  },
+
+  async getHealthResources(params: Record<string, string> = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/health-resources/resources?${query}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async createHealthResource(data: any) {
+    const res = await fetch(`${API_BASE}/health-resources/resources`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to add medical resource');
+    return json.data;
+  },
+
+  // ─────────────────────────────────────────────
+  // Audit Logs & Reports
+  // ─────────────────────────────────────────────
+  async getAuditLogs(params: Record<string, string | number | undefined> = {}) {
+    const cleanParams: Record<string, string> = {};
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== '') {
+        cleanParams[k] = String(v);
+      }
+    }
+    const query = new URLSearchParams(cleanParams).toString();
+    const res = await fetch(`${API_BASE}/audit-logs?${query}`, {
+      headers: getAuthHeaders()
+    });
+    return res.json();
   }
 };
+

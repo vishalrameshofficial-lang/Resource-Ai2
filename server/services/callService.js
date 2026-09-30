@@ -22,7 +22,12 @@ function parseCallRow(r) {
     metadata: r.metadata ? JSON.parse(r.metadata) : {},
     recording_url: r.recording_url || null,
     required_resources: Array.isArray(parsedResources) ? parsedResources : [],
-    telephony_source_ip: r.telephony_source_ip || 'Not available'
+    telephony_source_ip: r.telephony_source_ip || 'Not available',
+    detected_language: r.detected_language || r.language || 'English',
+    language_confidence: r.language_confidence || 0.85,
+    detected_at: r.detected_at || r.created_at,
+    original_transcript: r.original_transcript || (r.transcript ? JSON.parse(r.transcript) : []),
+    english_translation: r.english_translation || null
   };
 }
 
@@ -80,14 +85,18 @@ export class CallService {
         status, request_id, metadata,
         query, summary, department, required_service, required_resources,
         priority, location, affected_people, classification_confidence,
-        classification_status, telephony_source_ip, created_at
+        classification_status, telephony_source_ip,
+        detected_language, language_confidence, detected_at, original_transcript, english_translation,
+        created_at
       ) VALUES (
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?,
         ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
-        ?, ?, ?
+        ?, ?,
+        ?, ?, ?, ?, ?,
+        ?
       )
     `);
 
@@ -101,6 +110,13 @@ export class CallService {
     }
 
     const sourceIp = session.telephony_source_ip || session.telephonySourceIp || session.metadata?.telephony_source_ip || 'Not available';
+    const detectedLang = session.detected_language || session.language || 'English';
+    const langConf = session.language_confidence || 0.85;
+    const detectedAt = session.detected_at || session.startedAt || now;
+    const origTranscript = typeof session.original_transcript === 'string'
+      ? session.original_transcript
+      : JSON.stringify(session.original_transcript || session.transcript || []);
+    const engTranslation = session.english_translation || null;
 
     insertStmt.run(
       session.id,
@@ -110,7 +126,7 @@ export class CallService {
       session.exotelNumber || session.exotel_number || null,
       session.startedAt || session.started_at || now,
       session.endedAt || session.ended_at || now,
-      session.language || 'English',
+      session.language || detectedLang,
       JSON.stringify(session.transcript || []),
       session.recording_url || session.recordingUrl || null,
       session.aiSummary || session.ai_summary || session.summary || `Emergency call processed in ${session.language || 'English'}`,
@@ -128,6 +144,11 @@ export class CallService {
       session.classification_confidence ?? session.classificationConfidence ?? session.metadata?.classification?.confidence ?? 0.0,
       session.classification_status || session.classificationStatus || 'completed',
       sourceIp,
+      detectedLang,
+      langConf,
+      detectedAt,
+      origTranscript,
+      engTranslation,
       session.createdAt || session.created_at || now
     );
   }

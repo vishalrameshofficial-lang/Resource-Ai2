@@ -1,4 +1,5 @@
 import { MULTILINGUAL_STRINGS, CONVERSATION_STAGES, SYSTEM_SAFETY_PROMPT, DEPARTMENTS, POST_CALL_CLASSIFICATION_PROMPT } from './prompts.js';
+import { languageDetectionService } from './languageDetectionService.js';
 
 export function formatPeopleCount(count) {
   const numWordMap = {
@@ -40,14 +41,23 @@ export function formatResourcesForConfirmation(reqs) {
 export class AIProvider {
   async processUtterance(sessionState, callerUtterance) {
     const text = (callerUtterance || '').toLowerCase().trim();
-    const currentLang = sessionState.language || this.detectLanguage(callerUtterance) || 'English';
-    sessionState.language = currentLang;
 
-    // Detect language change request
-    const detectedLang = this.detectLanguage(callerUtterance);
-    if (detectedLang && detectedLang !== sessionState.language) {
-      sessionState.language = detectedLang;
+    // Automatic language detection from caller speech
+    const detection = languageDetectionService.detectLanguage(callerUtterance, {
+      currentLockedLang: sessionState.language
+    });
+
+    if (detection) {
+      // If language was not set or confidence is high enough to switch, adopt detected language
+      if (!sessionState.language || sessionState.language === 'English' || detection.confidence >= 0.88) {
+        sessionState.language = detection.language;
+      }
+      sessionState.detected_language = detection.language;
+      sessionState.language_confidence = detection.confidence;
+      sessionState.detected_at = detection.detectedAt;
     }
+
+    const currentLang = sessionState.language || 'English';
 
     // 1. Extract entities into session data
     this.extractEntities(sessionState, callerUtterance);
@@ -143,16 +153,14 @@ export class AIProvider {
     throw new Error('classifyCallQuery must be implemented by subclass');
   }
 
-  detectLanguage(text) {
+  detectLanguage(text, options = {}) {
     if (!text) return null;
-    if (/[\u0B80-\u0BFF]/.test(text) || /vanakkam|nandri|vellam|thanni|seri/i.test(text)) return 'Tamil';
-    if (/[\u0900-\u097F]/.test(text) || /namaste|baad|pani|khana|madad|log|haan/i.test(text)) return 'Hindi';
-    if (/[\u0C00-\u0C7F]/.test(text) || /namaskaram|avunu|kavali|sahayam/i.test(text)) return 'Telugu';
-    if (/[\u0D00-\u0D7F]/.test(text) || /vellappokkam|sahayam|aano/i.test(text)) return 'Malayalam';
-    if (/[\u0C80-\u0CFF]/.test(text) || /namaskara|beku|sari/i.test(text)) return 'Kannada';
-    if (/[\u0980-\u09FF]/.test(text) || /banya|jol|khabar|thik/i.test(text)) return 'Bengali';
-    if (/[\u0B00-\u0B7F]/.test(text) || /pani|sahajya|dhanyabad/i.test(text)) return 'Odia';
-    return null;
+    const result = languageDetectionService.detectLanguage(text, options);
+    return result ? result.language : null;
+  }
+
+  detectLanguageDetails(text, options = {}) {
+    return languageDetectionService.detectLanguage(text, options);
   }
 
   extractEntities(sessionState, text) {

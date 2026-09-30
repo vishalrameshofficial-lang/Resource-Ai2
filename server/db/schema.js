@@ -122,7 +122,330 @@ export function initializeDatabase() {
     );
   `);
 
-  // Create helpful indexes for performance
+  // Migrate emergency_requests table if multilingual/audit columns are missing
+  try {
+    const reqInfo = db.prepare(`PRAGMA table_info(emergency_requests)`).all();
+    const existingReqCols = new Set(reqInfo.map(col => col.name));
+    const reqColsToAdd = [
+      { name: 'detected_language', type: 'TEXT' },
+      { name: 'language_confidence', type: 'REAL' },
+      { name: 'detected_at', type: 'TEXT' },
+      { name: 'original_transcript', type: 'TEXT' },
+      { name: 'english_translation', type: 'TEXT' }
+    ];
+    for (const col of reqColsToAdd) {
+      if (!existingReqCols.has(col.name)) {
+        db.exec(`ALTER TABLE emergency_requests ADD COLUMN ${col.name} ${col.type}`);
+        console.log(`[DB] Added column ${col.name} to emergency_requests`);
+      }
+    }
+  } catch (err) {
+    console.warn('[DB] Migration error for emergency_requests columns:', err.message);
+  }
+
+  // Migrate call_sessions table for multilingual columns
+  try {
+    const csInfo = db.prepare(`PRAGMA table_info(call_sessions)`).all();
+    const existingCsCols = new Set(csInfo.map(col => col.name));
+    const csColsToAdd = [
+      { name: 'detected_language', type: 'TEXT' },
+      { name: 'language_confidence', type: 'REAL' },
+      { name: 'detected_at', type: 'TEXT' },
+      { name: 'original_transcript', type: 'TEXT' },
+      { name: 'english_translation', type: 'TEXT' }
+    ];
+    for (const col of csColsToAdd) {
+      if (!existingCsCols.has(col.name)) {
+        db.exec(`ALTER TABLE call_sessions ADD COLUMN ${col.name} ${col.type}`);
+        console.log(`[DB] Added column ${col.name} to call_sessions`);
+      }
+    }
+  } catch (err) {
+    console.warn('[DB] Migration error for call_sessions language columns:', err.message);
+  }
+
+  // ─────────────────────────────────────────────
+  // 5. EDUCATION DOMAIN TABLES
+  // ─────────────────────────────────────────────
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS education_institutions (
+      id TEXT PRIMARY KEY,
+      code TEXT UNIQUE,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      district TEXT NOT NULL,
+      taluk TEXT NOT NULL,
+      village_city TEXT,
+      location TEXT,
+      address TEXT,
+      contact_person TEXT,
+      phone TEXT,
+      email TEXT,
+      status TEXT NOT NULL DEFAULT 'ACTIVE',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS education_resources (
+      id TEXT PRIMARY KEY,
+      resource_id TEXT UNIQUE NOT NULL,
+      category TEXT NOT NULL,
+      resource_type TEXT NOT NULL,
+      name TEXT NOT NULL,
+      institution_id TEXT,
+      institution_name TEXT,
+      district TEXT NOT NULL,
+      total_quantity REAL NOT NULL DEFAULT 0,
+      available_quantity REAL NOT NULL DEFAULT 0,
+      allocated_quantity REAL NOT NULL DEFAULT 0,
+      unit TEXT NOT NULL,
+      condition TEXT NOT NULL DEFAULT 'GOOD',
+      notes TEXT,
+      last_updated TEXT NOT NULL,
+      updated_by TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS education_requests (
+      id TEXT PRIMARY KEY,
+      request_id TEXT UNIQUE NOT NULL,
+      institution_id TEXT,
+      institution_type TEXT NOT NULL,
+      institution_name TEXT NOT NULL,
+      institution_code TEXT,
+      district TEXT NOT NULL,
+      taluk TEXT NOT NULL,
+      village_city TEXT,
+      location TEXT,
+      resource_category TEXT NOT NULL,
+      resource_type TEXT NOT NULL,
+      specific_resource TEXT NOT NULL,
+      current_availability TEXT,
+      required_quantity REAL NOT NULL DEFAULT 1,
+      requested_quantity REAL NOT NULL DEFAULT 1,
+      unit TEXT NOT NULL,
+      reason_justification TEXT NOT NULL,
+      priority TEXT NOT NULL DEFAULT 'MEDIUM',
+      requested_by TEXT NOT NULL,
+      designation TEXT NOT NULL,
+      department TEXT NOT NULL,
+      contact_phone TEXT,
+      contact_email TEXT,
+      status TEXT NOT NULL DEFAULT 'SUBMITTED',
+      status_reason TEXT,
+      assigned_officer TEXT,
+      approved_by TEXT,
+      approved_at TEXT,
+      rejection_reason TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS education_allocations (
+      id TEXT PRIMARY KEY,
+      allocation_id TEXT UNIQUE NOT NULL,
+      request_id TEXT NOT NULL,
+      resource_id TEXT,
+      requested_quantity REAL NOT NULL,
+      approved_quantity REAL NOT NULL,
+      allocated_quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      source_location TEXT NOT NULL,
+      destination_location TEXT NOT NULL,
+      allocation_date TEXT NOT NULL,
+      allocated_by TEXT NOT NULL,
+      delivery_status TEXT NOT NULL DEFAULT 'PENDING',
+      delivery_date TEXT,
+      delivery_notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS education_request_documents (
+      id TEXT PRIMARY KEY,
+      request_id TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      file_size INTEGER NOT NULL,
+      storage_path TEXT NOT NULL,
+      doc_type TEXT NOT NULL,
+      uploaded_by TEXT NOT NULL,
+      uploaded_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS education_request_status_history (
+      id TEXT PRIMARY KEY,
+      request_id TEXT NOT NULL,
+      from_status TEXT,
+      to_status TEXT NOT NULL,
+      actor_name TEXT NOT NULL,
+      actor_role TEXT NOT NULL,
+      comments TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // ─────────────────────────────────────────────
+  // 6. HEALTH DOMAIN TABLES
+  // ─────────────────────────────────────────────
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS health_facilities (
+      id TEXT PRIMARY KEY,
+      code TEXT UNIQUE,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      district TEXT NOT NULL,
+      taluk TEXT NOT NULL,
+      location TEXT,
+      address TEXT,
+      contact_person TEXT,
+      phone TEXT,
+      email TEXT,
+      bed_capacity INTEGER DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'ACTIVE',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS health_resources (
+      id TEXT PRIMARY KEY,
+      resource_id TEXT UNIQUE NOT NULL,
+      facility_id TEXT,
+      facility_name TEXT,
+      district TEXT NOT NULL,
+      category TEXT NOT NULL,
+      resource_type TEXT NOT NULL,
+      name TEXT NOT NULL,
+      total_quantity REAL NOT NULL DEFAULT 0,
+      available_quantity REAL NOT NULL DEFAULT 0,
+      allocated_quantity REAL NOT NULL DEFAULT 0,
+      unit TEXT NOT NULL,
+      expiry_date TEXT,
+      batch_lot TEXT,
+      condition TEXT NOT NULL DEFAULT 'USABLE',
+      notes TEXT,
+      last_updated TEXT NOT NULL,
+      updated_by TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS health_requests (
+      id TEXT PRIMARY KEY,
+      request_id TEXT UNIQUE NOT NULL,
+      facility_id TEXT,
+      facility_type TEXT NOT NULL,
+      facility_name TEXT NOT NULL,
+      facility_code TEXT,
+      district TEXT NOT NULL,
+      taluk TEXT NOT NULL,
+      location TEXT,
+      resource_category TEXT NOT NULL,
+      resource_type TEXT NOT NULL,
+      specific_resource TEXT NOT NULL,
+      current_availability TEXT,
+      required_quantity REAL NOT NULL DEFAULT 1,
+      requested_quantity REAL NOT NULL DEFAULT 1,
+      unit TEXT NOT NULL,
+      reason_justification TEXT NOT NULL,
+      priority TEXT NOT NULL DEFAULT 'MEDIUM',
+      requested_by TEXT NOT NULL,
+      designation TEXT NOT NULL,
+      department TEXT NOT NULL,
+      contact_phone TEXT,
+      contact_email TEXT,
+      status TEXT NOT NULL DEFAULT 'SUBMITTED',
+      status_reason TEXT,
+      assigned_officer TEXT,
+      approved_by TEXT,
+      approved_at TEXT,
+      rejection_reason TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS health_allocations (
+      id TEXT PRIMARY KEY,
+      allocation_id TEXT UNIQUE NOT NULL,
+      request_id TEXT NOT NULL,
+      resource_id TEXT,
+      source_facility_id TEXT,
+      source_facility_name TEXT,
+      destination_facility_id TEXT,
+      destination_facility_name TEXT,
+      requested_quantity REAL NOT NULL,
+      approved_quantity REAL NOT NULL,
+      allocated_quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      allocation_date TEXT NOT NULL,
+      allocated_by TEXT NOT NULL,
+      delivery_status TEXT NOT NULL DEFAULT 'PENDING',
+      delivery_date TEXT,
+      delivery_notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS health_request_documents (
+      id TEXT PRIMARY KEY,
+      request_id TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      file_size INTEGER NOT NULL,
+      storage_path TEXT NOT NULL,
+      doc_type TEXT NOT NULL,
+      uploaded_by TEXT NOT NULL,
+      uploaded_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS health_request_status_history (
+      id TEXT PRIMARY KEY,
+      request_id TEXT NOT NULL,
+      from_status TEXT,
+      to_status TEXT NOT NULL,
+      actor_name TEXT NOT NULL,
+      actor_role TEXT NOT NULL,
+      comments TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // ─────────────────────────────────────────────
+  // 7. AUDIT LOGS & NOTIFICATIONS (COMMON)
+  // ─────────────────────────────────────────────
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      user_email TEXT,
+      user_name TEXT,
+      role TEXT,
+      domain TEXT NOT NULL,
+      action TEXT NOT NULL,
+      entity TEXT NOT NULL,
+      entity_id TEXT NOT NULL,
+      previous_value TEXT,
+      new_value TEXT,
+      ip_address TEXT,
+      reason TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT PRIMARY KEY,
+      domain TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      severity TEXT NOT NULL DEFAULT 'INFO',
+      entity_id TEXT,
+      target_role TEXT,
+      is_read INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // Performance Indexes across all domains
   try {
     db.exec(`
       CREATE INDEX IF NOT EXISTS idx_requests_status ON emergency_requests(status);
@@ -132,6 +455,31 @@ export function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_calls_dept ON call_sessions(department);
       CREATE INDEX IF NOT EXISTS idx_calls_priority ON call_sessions(priority);
       CREATE INDEX IF NOT EXISTS idx_timeline_request ON dispatch_timeline(request_id);
+
+      -- Education indexes
+      CREATE INDEX IF NOT EXISTS idx_edu_req_id ON education_requests(request_id);
+      CREATE INDEX IF NOT EXISTS idx_edu_req_status ON education_requests(status);
+      CREATE INDEX IF NOT EXISTS idx_edu_req_district ON education_requests(district);
+      CREATE INDEX IF NOT EXISTS idx_edu_req_cat ON education_requests(resource_category);
+      CREATE INDEX IF NOT EXISTS idx_edu_req_created ON education_requests(created_at);
+      CREATE INDEX IF NOT EXISTS idx_edu_res_cat ON education_resources(category);
+      CREATE INDEX IF NOT EXISTS idx_edu_inst_district ON education_institutions(district);
+
+      -- Health indexes
+      CREATE INDEX IF NOT EXISTS idx_hlt_req_id ON health_requests(request_id);
+      CREATE INDEX IF NOT EXISTS idx_hlt_req_status ON health_requests(status);
+      CREATE INDEX IF NOT EXISTS idx_hlt_req_district ON health_requests(district);
+      CREATE INDEX IF NOT EXISTS idx_hlt_req_cat ON health_requests(resource_category);
+      CREATE INDEX IF NOT EXISTS idx_hlt_req_created ON health_requests(created_at);
+      CREATE INDEX IF NOT EXISTS idx_hlt_res_cat ON health_resources(category);
+      CREATE INDEX IF NOT EXISTS idx_hlt_fac_district ON health_facilities(district);
+
+      -- Audit & Notification indexes
+      CREATE INDEX IF NOT EXISTS idx_audit_domain ON audit_logs(domain);
+      CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_logs(entity_id);
+      CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
+      CREATE INDEX IF NOT EXISTS idx_notif_domain ON notifications(domain);
+      CREATE INDEX IF NOT EXISTS idx_notif_read ON notifications(is_read);
     `);
   } catch (err) {
     console.warn('[DB] Index creation warning:', err.message);
