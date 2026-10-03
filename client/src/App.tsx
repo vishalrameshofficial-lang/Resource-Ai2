@@ -116,6 +116,46 @@ function AppContent() {
     }
   }, [notification]);
 
+  const [initialOvoiPortal, setInitialOvoiPortal] = useState<'CITIZEN' | 'ADMIN' | 'DEPARTMENT_INCHARGE' | undefined>(undefined);
+
+  // URL route parsing for direct navigation (/our-voice-our-issue, /user, /admin, /in-charge)
+  useEffect(() => {
+    const handleUrlRoute = () => {
+      const path = (window.location.pathname || '').toLowerCase();
+      const hash = (window.location.hash || '').toLowerCase();
+
+      if (
+        path.includes('/our-voice-our-issue') ||
+        hash.includes('/our-voice-our-issue') ||
+        hash.includes('our-voice')
+      ) {
+        setViewMode('dashboard');
+        setActiveTab('our-voice-our-issue');
+        if (path.includes('/user') || hash.includes('/user') || hash.includes('citizen')) {
+          setInitialOvoiPortal('CITIZEN');
+        } else if (path.includes('/admin') || hash.includes('/admin')) {
+          setInitialOvoiPortal('ADMIN');
+        } else if (
+          path.includes('/in-charge') ||
+          path.includes('/incharge') ||
+          hash.includes('/in-charge') ||
+          hash.includes('/incharge') ||
+          hash.includes('officer')
+        ) {
+          setInitialOvoiPortal('DEPARTMENT_INCHARGE');
+        }
+      }
+    };
+
+    handleUrlRoute();
+    window.addEventListener('popstate', handleUrlRoute);
+    window.addEventListener('hashchange', handleUrlRoute);
+    return () => {
+      window.removeEventListener('popstate', handleUrlRoute);
+      window.removeEventListener('hashchange', handleUrlRoute);
+    };
+  }, []);
+
   if (viewMode === 'landing') {
     return (
       <LandingPage
@@ -445,7 +485,7 @@ function AppContent() {
           {/* TAB: OUR VOICE OUR ISSUE CIVIC GRIEVANCE & TELEPHONY */}
           {activeTab === 'our-voice-our-issue' && (
             <div className="max-w-7xl mx-auto">
-              <OurVoiceOurIssueModule />
+              <OurVoiceOurIssueModule initialPortal={initialOvoiPortal} />
             </div>
           )}
 

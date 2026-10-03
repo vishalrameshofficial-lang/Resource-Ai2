@@ -557,6 +557,14 @@ export const api = {
   }
 };
 
+const getOVOIHeaders = (customToken?: string): HeadersInit => {
+  const token = customToken || localStorage.getItem('ovoi_token') || localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+};
+
 export const ourVoiceApi = {
   // Auth
   async login(email: string, password: string) {
@@ -570,7 +578,7 @@ export const ourVoiceApi = {
     return json;
   },
 
-  async register(data: { name: string; email: string; password: string; phone?: string; role?: string; department_id?: string }) {
+  async register(data: { name: string; email: string; password: string; phone?: string; role?: string }) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -581,9 +589,9 @@ export const ourVoiceApi = {
     return json;
   },
 
-  async getMe() {
+  async getMe(token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/auth/me`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Failed to fetch user');
@@ -597,10 +605,10 @@ export const ourVoiceApi = {
     return json.departments || [];
   },
 
-  async saveDepartment(data: any) {
+  async saveDepartment(data: any, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/departments`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify(data)
     });
     const json = await res.json();
@@ -608,26 +616,37 @@ export const ourVoiceApi = {
     return json.department;
   },
 
-  async getOfficers(departmentId?: string) {
+  async getOfficers(departmentId?: string, token?: string) {
     const q = departmentId ? `?department_id=${encodeURIComponent(departmentId)}` : '';
     const res = await fetch(`${API_BASE}/our-voice-our-issue/officers${q}`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     return json.officers || [];
   },
 
+  async createOfficer(data: { name: string; email: string; password: string; departmentId: string; phone?: string }, token?: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/officers`, {
+      method: 'POST',
+      headers: getOVOIHeaders(token),
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to create officer account');
+    return json;
+  },
+
   // Stats
-  async getStats() {
+  async getStats(token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/stats`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     return json.stats;
   },
 
   // Complaints
-  async getComplaints(filters: Record<string, string | number> = {}) {
+  async getComplaints(filters: Record<string, string | number> = {}, token?: string) {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {
@@ -635,15 +654,24 @@ export const ourVoiceApi = {
       }
     });
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints?${params.toString()}`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     return json;
   },
 
-  async getComplaintById(id: string) {
+  async getMyComplaints(token?: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/my`, {
+      headers: getOVOIHeaders(token)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to fetch citizen complaints');
+    return json.complaints || [];
+  },
+
+  async getComplaintById(id: string, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Complaint not found');
@@ -657,10 +685,10 @@ export const ourVoiceApi = {
     return json.complaint;
   },
 
-  async createComplaint(data: any) {
+  async createComplaint(data: any, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify(data)
     });
     const json = await res.json();
@@ -668,10 +696,10 @@ export const ourVoiceApi = {
     return json.complaint;
   },
 
-  async assignComplaint(id: string, departmentId: string, officerId?: string, notes?: string) {
+  async assignComplaint(id: string, departmentId: string, officerId?: string, notes?: string, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/assign`, {
       method: 'PATCH',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify({ departmentId, officerId, notes })
     });
     const json = await res.json();
@@ -679,10 +707,10 @@ export const ourVoiceApi = {
     return json.complaint;
   },
 
-  async updateStatus(id: string, targetState: string, options: { notes?: string; resolutionDetails?: string; rejectionReason?: string; officerNotes?: string } = {}) {
+  async updateStatus(id: string, targetState: string, options: { notes?: string; resolutionDetails?: string; expectedCompletionDate?: string; resolutionEvidenceUrl?: string } = {}, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/status`, {
       method: 'PATCH',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify({ targetState, ...options })
     });
     const json = await res.json();
@@ -690,10 +718,10 @@ export const ourVoiceApi = {
     return json.complaint;
   },
 
-  async submitFeedback(id: string, data: { isDisputed?: boolean; disputeReason?: string; rating?: number; feedback?: string }) {
+  async submitFeedback(id: string, data: { isDisputed?: boolean; disputeReason?: string; rating?: number; feedback?: string }, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/feedback`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify(data)
     });
     const json = await res.json();
@@ -701,10 +729,10 @@ export const ourVoiceApi = {
     return json.complaint;
   },
 
-  async addEvidence(id: string, data: { fileUrl: string; fileType?: string; description?: string; isBeforeResolution?: boolean }) {
+  async addEvidence(id: string, data: { fileUrl: string; fileType?: string; description?: string; isBeforeResolution?: boolean }, token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/evidence`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: getOVOIHeaders(token),
       body: JSON.stringify(data)
     });
     const json = await res.json();
@@ -712,9 +740,9 @@ export const ourVoiceApi = {
     return json.evidence;
   },
 
-  async getNotifications() {
+  async getNotifications(token?: string) {
     const res = await fetch(`${API_BASE}/our-voice-our-issue/notifications`, {
-      headers: getAuthHeaders()
+      headers: getOVOIHeaders(token)
     });
     const json = await res.json();
     return json.notifications || [];

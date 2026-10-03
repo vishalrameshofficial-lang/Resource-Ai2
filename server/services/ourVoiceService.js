@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { eventBus } from '../websocket/eventBus.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'resourceai_jwt_super_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'resourceai_emergency_super_secret_jwt_key_2026';
 
 // ─────────────────────────────────────────────
 // DEFAULT CONFIGURABLE DEPARTMENTS & SUBCATEGORIES
@@ -154,17 +154,21 @@ export const INITIAL_DEPARTMENTS = [
 
 export const VALID_STATUSES = [
   'SUBMITTED',
+  'UNDER_REVIEW',
   'UNASSIGNED',
   'ASSIGNED',
   'ACCEPTED',
   'IN_PROGRESS',
+  'NEEDS_INFORMATION',
   'AWAITING_INFORMATION',
   'RESOLVED',
+  'CLOSED',
   'REOPENED',
   'ESCALATED',
-  'REJECTED',
-  'CLOSED'
+  'REJECTED'
 ];
+
+export const VALID_CHANNELS = ['VOICE', 'MANUAL', 'PHONE'];
 
 export const VALID_PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 
@@ -640,7 +644,7 @@ export class OurVoiceService {
   createComplaint({
     title,
     description,
-    source = 'WEB',
+    source = 'MANUAL',
     citizenId = null,
     citizenName = null,
     citizenPhone = null,
@@ -668,6 +672,13 @@ export class OurVoiceService {
     const id = `comp-${uuidv4()}`;
     const now = new Date();
     const nowIso = now.toISOString();
+
+    // Canonical channel normalization: VOICE, MANUAL, PHONE
+    let normalizedChannel = 'MANUAL';
+    const s = String(source || '').toUpperCase();
+    if (s.includes('VOICE') || s.includes('SPEECH')) normalizedChannel = 'VOICE';
+    else if (s.includes('PHONE') || s.includes('EXOTEL') || s.includes('CALL')) normalizedChannel = 'PHONE';
+    else normalizedChannel = 'MANUAL';
 
     // Generate unique complaint ID: OVOI-2026-XXXXX
     const year = now.getFullYear();
@@ -722,7 +733,7 @@ export class OurVoiceService {
         ?, ?, 'WITHIN_SLA', ?, ?
       )
     `).run(
-      id, complaintId, title.trim(), description.trim(), source, callSid, recordingUrl, transcript,
+      id, complaintId, title.trim(), description.trim(), normalizedChannel, callSid, recordingUrl, transcript,
       citizenId, citizenName, citizenPhone, citizenEmail,
       departmentId || null, deptName, subcategoryId || null, subcatName,
       initialStatus, validPriority, validPriority === 'CRITICAL' ? 95 : validPriority === 'HIGH' ? 75 : validPriority === 'MEDIUM' ? 50 : 25,
@@ -732,7 +743,7 @@ export class OurVoiceService {
     );
 
     // Record initial status history
-    this.recordStatusChange(id, null, initialStatus, citizenId || 'system', citizenName || (source === 'EXOTEL' ? 'Telephone Caller' : 'Citizen'), 'CITIZEN', 'Complaint submitted via ' + source);
+    this.recordStatusChange(id, null, initialStatus, citizenId || 'system', citizenName || (normalizedChannel === 'PHONE' ? 'Telephone Caller' : 'Citizen'), 'CITIZEN', 'Complaint submitted via ' + normalizedChannel);
 
     // Record initial assignment history if department was selected
     if (departmentId) {
@@ -759,7 +770,7 @@ export class OurVoiceService {
       role: 'ADMIN',
       complaintId: id,
       title: `New Complaint: ${complaintId}`,
-      message: `${validPriority} priority: "${title.slice(0, 50)}" in ${locationName || 'Tamil Nadu'}`,
+      message: `${validPriority} priority [${normalizedChannel}]: "${title.slice(0, 50)}" in ${locationName || 'Tamil Nadu'}`,
       type: 'NEW_COMPLAINT'
     });
 
@@ -776,7 +787,7 @@ export class OurVoiceService {
     }
 
     // Real-time broadcast to dashboard clients
-    eventBus.broadcast('OVOI_COMPLAINT_CREATED', { id, complaintId, title, departmentName: deptName, priority: validPriority, state: initialStatus });
+    eventBus.broadcast('OVOI_COMPLAINT_CREATED', { id, complaintId, title, departmentName: deptName, priority: validPriority, state: initialStatus, source: normalizedChannel });
 
     return this.getComplaintById(id);
   }
@@ -826,7 +837,7 @@ export class OurVoiceService {
     return this.createComplaint({
       title,
       description,
-      source: 'EXOTEL',
+      source: 'PHONE',
       callSid: session.callSid,
       recordingUrl: session.recording_url || null,
       transcript: transcriptText,
@@ -842,8 +853,11 @@ export class OurVoiceService {
   // ─────────────────────────────────────────────
   // COMPLAINT RETRIEVAL & FILTERING (RBAC SCOPED)
   // ─────────────────────────────────────────────
-  getComplaints({ user, state, departmentId, priority, source, search, limit = 50, offset = 0 }) {
+  getComplaints(filtersOrParams = {}, userParam = null) {
     const db = getDatabase();
+    const user = userParam || filtersOrParams.user || null;
+    const { state, departmentId, priority, source, search, limit = 50, offset = 0 } = filtersOrParams;
+
     let whereClauses = [];
     let params = [];
 
@@ -855,7 +869,7 @@ export class OurVoiceService {
         params.push(user.department_id);
       } else if (user.role === 'CITIZEN') {
         // Citizens can only view their own complaints or complaints matching their verified phone
-        whereClauses.push('(c.citizen_id = ? OR c.citizen_phone = ?)');
+        whereClauses.push('(c.citizen_id = ? OR (c.citizen_phone IS NOT NULL AND c.citizen_phone = ?))');
         params.push(user.id, user.phone || 'none');
       }
     }
@@ -876,8 +890,11 @@ export class OurVoiceService {
     }
 
     if (source && source !== 'ALL') {
+      let filterChannel = source.toUpperCase();
+      if (filterChannel === 'EXOTEL') filterChannel = 'PHONE';
+      if (filterChannel === 'WEB') filterChannel = 'MANUAL';
       whereClauses.push('c.source = ?');
-      params.push(source.toUpperCase());
+      params.push(filterChannel);
     }
 
     if (search && search.trim()) {
@@ -908,6 +925,23 @@ export class OurVoiceService {
     const items = queryStmt.all(...params, limit, offset);
 
     return { total, items, limit, offset };
+  }
+
+  getMyComplaints(user) {
+    if (!user || !user.id) {
+      throw new Error('Authentication required to retrieve citizen complaints');
+    }
+    const db = getDatabase();
+    return db.prepare(`
+      SELECT c.*,
+             d.code as department_code,
+             u.name as incharge_name, u.phone as incharge_phone
+      FROM complaints c
+      LEFT JOIN complaint_departments d ON c.department_id = d.id
+      LEFT JOIN users u ON c.assigned_officer_id = u.id
+      WHERE c.citizen_id = ? OR (c.citizen_phone IS NOT NULL AND c.citizen_phone = ?)
+      ORDER BY c.created_at DESC
+    `).all(user.id, user.phone || 'none');
   }
 
   getComplaintById(id, user = null) {
@@ -1164,6 +1198,17 @@ export class OurVoiceService {
     return this.getComplaintById(complaint.id);
   }
 
+  recordCitizenFeedback(complaintId, { isDisputed, disputeReason, rating, feedback, citizenId }) {
+    return this.submitFeedback({
+      complaintId,
+      citizenId,
+      rating,
+      feedback,
+      dispute: Boolean(isDisputed),
+      disputeReason
+    });
+  }
+
   // ─────────────────────────────────────────────
   // AUDIT & NOTIFICATION HELPERS
   // ─────────────────────────────────────────────
@@ -1231,9 +1276,18 @@ export class OurVoiceService {
     const resolved = db.prepare(`SELECT COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} state IN ('RESOLVED', 'CLOSED')`).get(...scopeParams)?.count || 0;
     const critical = db.prepare(`SELECT COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} priority = 'CRITICAL' AND state NOT IN ('RESOLVED', 'CLOSED', 'REJECTED')`).get(...scopeParams)?.count || 0;
     const disputed = db.prepare(`SELECT COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} state = 'REOPENED'`).get(...scopeParams)?.count || 0;
+    const escalated = db.prepare(`SELECT COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} state = 'ESCALATED'`).get(...scopeParams)?.count || 0;
+    const overdue = db.prepare(`SELECT COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} datetime('now') > datetime(sla_deadline) AND state NOT IN ('RESOLVED', 'CLOSED', 'REJECTED')`).get(...scopeParams)?.count || 0;
 
     // By source
     const bySource = db.prepare(`SELECT source, COUNT(*) as count FROM complaints ${scopeSql} GROUP BY source`).all(...scopeParams);
+
+    const byChannel = { VOICE: 0, MANUAL: 0, PHONE: 0 };
+    for (const s of bySource) {
+      if (s.source === 'VOICE') byChannel.VOICE = s.count;
+      else if (s.source === 'PHONE' || s.source === 'EXOTEL') byChannel.PHONE += s.count;
+      else byChannel.MANUAL += s.count;
+    }
 
     // By department
     const byDept = db.prepare(`SELECT department_name, COUNT(*) as count FROM complaints ${scopeSql ? scopeSql + ' AND' : 'WHERE'} department_name IS NOT NULL GROUP BY department_name`).all(...scopeParams);
@@ -1246,8 +1300,11 @@ export class OurVoiceService {
       resolved,
       critical,
       disputed,
+      escalated,
+      overdue,
       resolutionRate: total > 0 ? Math.round((resolved / total) * 100) : 0,
       bySource,
+      byChannel,
       byDepartment: byDept
     };
   }

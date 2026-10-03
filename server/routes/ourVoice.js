@@ -28,36 +28,31 @@ router.post('/auth/login', async (req, res, next) => {
   }
 });
 
-// Register (for Citizens or Officers)
+// Register (for Citizens ONLY - Admin & In-Charge accounts must be provisioned by Main Admin)
 router.post('/auth/register', async (req, res, next) => {
   try {
-    const { name, email, password, phone, role, department_id } = req.body;
+    const { name, email, password, phone, role } = req.body;
     if (!email || !password || !name) {
       return res.status(400).json({ success: false, error: 'Name, email, and password are required' });
     }
 
-    let authResult;
-    if (role === 'DEPARTMENT_INCHARGE' && department_id) {
-      await ourVoiceService.createOfficerAccount({
-        name,
-        email,
-        password,
-        departmentId: department_id,
-        phone
-      });
-      authResult = await ourVoiceService.login({ email, password });
-    } else {
-      authResult = await ourVoiceService.registerCitizen({
-        name,
-        email,
-        phone,
-        password
+    if (role && role !== 'CITIZEN') {
+      return res.status(403).json({
+        success: false,
+        error: 'Public registration is only available for citizens. Department In-Charge and Administrator accounts must be provisioned by the Main Admin.'
       });
     }
 
+    const authResult = await ourVoiceService.registerCitizen({
+      name,
+      email,
+      phone,
+      password
+    });
+
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
+      message: 'Citizen registration successful',
       token: authResult.token,
       user: authResult.user
     });
@@ -126,6 +121,27 @@ router.get('/officers', authenticate, async (req, res, next) => {
   }
 });
 
+// Admin: Provision new Department In-Charge Officer
+router.post('/officers', authenticate, requireRole('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+  try {
+    const { name, email, password, departmentId, phone } = req.body;
+    const officer = ourVoiceService.createOfficerAccount({
+      name,
+      email,
+      password,
+      departmentId,
+      phone
+    });
+    res.status(201).json({
+      success: true,
+      message: 'Department In-Charge account created successfully',
+      officer
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────
 // 3. ANALYTICS & STATS
 // ─────────────────────────────────────────────
@@ -142,6 +158,16 @@ router.get('/stats', optionalAuthenticate, async (req, res, next) => {
 // ─────────────────────────────────────────────
 // 4. COMPLAINTS LIFECYCLE
 // ─────────────────────────────────────────────
+
+// Authenticated Citizen Complaints ("My Complaints")
+router.get('/complaints/my', authenticate, async (req, res, next) => {
+  try {
+    const complaints = ourVoiceService.getMyComplaints(req.user);
+    res.json({ success: true, complaints });
+  } catch (err) {
+    res.status(401).json({ success: false, error: err.message });
+  }
+});
 
 // List Complaints (Role-scoped RBAC automatically applied)
 router.get('/complaints', optionalAuthenticate, async (req, res, next) => {
@@ -289,12 +315,13 @@ router.post('/complaints/:id/feedback', optionalAuthenticate, async (req, res, n
     const { isDisputed, disputeReason, rating, feedback } = req.body;
     const citizenId = req.user ? req.user.id : null;
 
-    const updated = await ourVoiceService.recordCitizenFeedback(req.params.id, {
-      isDisputed,
-      disputeReason,
+    const updated = await ourVoiceService.submitFeedback({
+      complaintId: req.params.id,
+      citizenId,
       rating,
       feedback,
-      citizenId
+      dispute: Boolean(isDisputed),
+      disputeReason
     });
 
     res.json({

@@ -176,17 +176,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => handleEnter('our-voice-our-issue')}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white font-bold text-sm hover:opacity-95 transition-all shadow-md shadow-indigo-500/25 flex items-center gap-2 transform hover:-translate-y-0.5 border border-indigo-400/40"
+            >
+              <Megaphone className="w-4 h-4 text-cyan-300 animate-pulse" />
+              <span>Our Voice Our Issue</span>
+            </button>
             <button
               onClick={() => handleEnter()}
-              className="px-5 py-2.5 rounded-xl border border-blue-200 text-blue-700 font-semibold text-sm hover:bg-blue-50/80 hover:border-blue-300 transition-all flex items-center gap-2 shadow-xs"
+              className="px-4 py-2.5 rounded-xl border border-blue-200 text-blue-700 font-semibold text-sm hover:bg-blue-50/80 hover:border-blue-300 transition-all flex items-center gap-2 shadow-xs"
             >
               <LayoutDashboard className="w-4 h-4 text-blue-600" />
               View Dashboard
             </button>
             <button
               onClick={() => handleEnter()}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-semibold text-sm hover:opacity-95 transition-all shadow-md shadow-blue-500/25 flex items-center gap-2 transform hover:-translate-y-0.5"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-semibold text-sm hover:opacity-95 transition-all shadow-md shadow-blue-500/25 flex items-center gap-2 transform hover:-translate-y-0.5"
             >
               Get Started
               <ArrowRight className="w-4 h-4" />
@@ -284,22 +291,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                <button
+                  onClick={() => handleEnter('our-voice-our-issue')}
+                  className="px-7 py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white font-extrabold text-base hover:shadow-xl hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 border border-indigo-400/40 shadow-lg group"
+                >
+                  <Megaphone className="w-5 h-5 text-cyan-300 animate-pulse" />
+                  <span>Our Voice Our Issue</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
                 <button
                   onClick={() => handleEnter()}
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-bold text-base hover:shadow-xl hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 group"
+                  className="px-7 py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-bold text-base hover:shadow-xl hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 group"
                 >
                   Explore Platform
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => setShowVideoModal(true)}
-                  className="px-7 py-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 font-semibold text-base hover:bg-blue-50/50 transition-all flex items-center justify-center gap-3 shadow-xs"
+                  className="px-6 py-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 font-semibold text-base hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2 shadow-xs"
                 >
-                  <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <Play className="w-3 h-3 fill-current ml-0.5" />
                   </div>
-                  Watch How It Works
+                  Watch Demo
                 </button>
               </div>
 
