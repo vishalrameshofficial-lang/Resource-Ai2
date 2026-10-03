@@ -7,6 +7,7 @@ import { getSTTProvider } from '../ai/sttProvider.js';
 import { getTTSProvider } from '../ai/ttsProvider.js';
 import { eventBus } from './eventBus.js';
 import { complaintDispatchService } from '../services/complaintDispatchService.js';
+import { ourVoiceService } from '../services/ourVoiceService.js';
 import { mulawToPcm16, pcm16ToMulaw, calculateRms, createWav } from '../utils/audioCodec.js';
 
 // Exact greeting message required by Resource AI
@@ -342,6 +343,16 @@ async function enqueuePostCallJob({
       }
     } catch (dispatchErr) {
       console.warn('[PostCallJob] Complaint auto-dispatch notice:', dispatchErr.message);
+    }
+
+    // 10. Register in Our Voice Our Issue complaint management system
+    try {
+      const ovoiComplaint = await ourVoiceService.registerFromExotelCall(session);
+      if (ovoiComplaint) {
+        console.log(`[PostCallJob] ✅ Our Voice Our Issue complaint registered: ${ovoiComplaint.id} (${ovoiComplaint.complaint_id})`);
+      }
+    } catch (ovoiErr) {
+      console.warn('[PostCallJob] Our Voice Our Issue intake notice:', ovoiErr.message);
     }
   } catch (err) {
     console.error('[PostCallJob] Post-call classification error:', err.message);

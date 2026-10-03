@@ -27,11 +27,12 @@ import {
   Sliders,
   FileText,
   PhoneCall,
-  LayoutDashboard
+  LayoutDashboard,
+  Megaphone
 } from 'lucide-react';
 
 interface LandingPageProps {
-  onEnterDashboard: () => void;
+  onEnterDashboard: (targetTab?: string) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) => {
@@ -39,6 +40,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedResource, setSelectedResource] = useState<string | null>('beds');
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const handleEnter = (tab?: string) => onEnterDashboard(typeof tab === 'string' ? tab : undefined);
 
   // Floating connected resources for AI Visualization
   const resourceNodes = [
@@ -176,14 +178,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
             <button
-              onClick={onEnterDashboard}
+              onClick={() => handleEnter()}
               className="px-5 py-2.5 rounded-xl border border-blue-200 text-blue-700 font-semibold text-sm hover:bg-blue-50/80 hover:border-blue-300 transition-all flex items-center gap-2 shadow-xs"
             >
               <LayoutDashboard className="w-4 h-4 text-blue-600" />
               View Dashboard
             </button>
             <button
-              onClick={onEnterDashboard}
+              onClick={() => handleEnter()}
               className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-semibold text-sm hover:opacity-95 transition-all shadow-md shadow-blue-500/25 flex items-center gap-2 transform hover:-translate-y-0.5"
             >
               Get Started
@@ -231,14 +233,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
             </button>
             <div className="pt-3 border-t border-slate-100 space-y-2">
               <button
-                onClick={onEnterDashboard}
+                onClick={() => handleEnter()}
                 className="w-full py-2.5 rounded-xl border border-blue-200 text-blue-700 font-semibold text-sm hover:bg-blue-50 flex items-center justify-center gap-2"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 View Dashboard
               </button>
               <button
-                onClick={onEnterDashboard}
+                onClick={() => handleEnter()}
                 className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold text-sm flex items-center justify-center gap-2"
               >
                 Get Started
@@ -284,7 +286,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                 <button
-                  onClick={onEnterDashboard}
+                  onClick={() => handleEnter()}
                   className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-bold text-base hover:shadow-xl hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 group"
                 >
                   Explore Platform
@@ -351,7 +353,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
 
                 {/* Central AI Cube Element */}
                 <div className="relative z-20 flex flex-col items-center justify-center">
-                  <div className="relative group cursor-pointer" onClick={onEnterDashboard}>
+                  <div className="relative group cursor-pointer" onClick={() => handleEnter()}>
                     {/* Concentric Glowing Rings */}
                     <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-blue-500/30 to-cyan-400/30 blur-md animate-ping" />
                     <div className="absolute -inset-10 rounded-full border border-cyan-400/30 animate-spin-slow" />
@@ -560,10 +562,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
                     <p className="text-xs text-slate-400 mt-1">School capacity management, teacher allocation, and facility upgrades.</p>
                   </div>
                 </div>
+
+                <div 
+                  onClick={() => onEnterDashboard('our-voice-our-issue')}
+                  className="flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-r from-indigo-950/80 to-slate-900 border border-indigo-500/50 hover:border-cyan-400 cursor-pointer transition shadow-lg group"
+                >
+                  <Megaphone className="w-6 h-6 text-cyan-400 shrink-0 mt-1 group-hover:scale-110 transition-transform" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-white text-base">Our Voice Our Issue (Civic Telephony)</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">Helpline +91 44 4761 5477</span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1">24x7 AI Voice Grievance intake, 8 municipal departments, SLA tracking, and 3-tier portal.</p>
+                  </div>
+                </div>
               </div>
 
               <button
-                onClick={onEnterDashboard}
+                onClick={() => handleEnter()}
                 className="mt-4 px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/20"
               >
                 Launch Operations Dashboard
@@ -642,7 +658,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <button
-              onClick={onEnterDashboard}
+              onClick={() => handleEnter()}
               className="px-8 py-4 rounded-xl bg-white text-blue-700 font-extrabold text-base hover:bg-slate-50 transition-all shadow-xl flex items-center gap-2 transform hover:scale-105"
             >
               Open Dashboard Platform
@@ -661,7 +677,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) =>
             <span className="text-slate-600">| © 2026 ResourceAI. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6 text-slate-400">
-            <button onClick={onEnterDashboard} className="hover:text-cyan-400">Dashboard</button>
+            <button onClick={() => handleEnter()} className="hover:text-cyan-400">Dashboard</button>
             <button onClick={() => handleNavClick('platform')} className="hover:text-cyan-400">Platform</button>
             <button onClick={() => handleNavClick('solutions')} className="hover:text-cyan-400">Solutions</button>
             <button onClick={() => handleNavClick('challenge')} className="hover:text-cyan-400">Challenge</button>

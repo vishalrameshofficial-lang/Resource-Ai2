@@ -1,7 +1,7 @@
 const API_BASE = '/api';
 
 function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('resourceai_token');
+  const token = localStorage.getItem('ourvoice_token') || localStorage.getItem('resourceai_token');
   const headers: HeadersInit = {
     'Content-Type': 'application/json'
   };
@@ -556,4 +556,169 @@ export const api = {
     return json.data || [];
   }
 };
+
+export const ourVoiceApi = {
+  // Auth
+  async login(email: string, password: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Login failed');
+    return json;
+  },
+
+  async register(data: { name: string; email: string; password: string; phone?: string; role?: string; department_id?: string }) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Registration failed');
+    return json;
+  },
+
+  async getMe() {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/auth/me`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to fetch user');
+    return json.user;
+  },
+
+  // Departments & Officers
+  async getDepartments() {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/departments`);
+    const json = await res.json();
+    return json.departments || [];
+  },
+
+  async saveDepartment(data: any) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/departments`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to save department');
+    return json.department;
+  },
+
+  async getOfficers(departmentId?: string) {
+    const q = departmentId ? `?department_id=${encodeURIComponent(departmentId)}` : '';
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/officers${q}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.officers || [];
+  },
+
+  // Stats
+  async getStats() {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/stats`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.stats;
+  },
+
+  // Complaints
+  async getComplaints(filters: Record<string, string | number> = {}) {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') {
+        params.append(k, String(v));
+      }
+    });
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints?${params.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json;
+  },
+
+  async getComplaintById(id: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Complaint not found');
+    return json.complaint;
+  },
+
+  async trackComplaint(identifier: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/track/${encodeURIComponent(identifier)}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Complaint not found');
+    return json.complaint;
+  },
+
+  async createComplaint(data: any) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to register complaint');
+    return json.complaint;
+  },
+
+  async assignComplaint(id: string, departmentId: string, officerId?: string, notes?: string) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/assign`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ departmentId, officerId, notes })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to assign complaint');
+    return json.complaint;
+  },
+
+  async updateStatus(id: string, targetState: string, options: { notes?: string; resolutionDetails?: string; rejectionReason?: string; officerNotes?: string } = {}) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ targetState, ...options })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to update status');
+    return json.complaint;
+  },
+
+  async submitFeedback(id: string, data: { isDisputed?: boolean; disputeReason?: string; rating?: number; feedback?: string }) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/feedback`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to submit feedback');
+    return json.complaint;
+  },
+
+  async addEvidence(id: string, data: { fileUrl: string; fileType?: string; description?: string; isBeforeResolution?: boolean }) {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/complaints/${id}/evidence`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to upload evidence');
+    return json.evidence;
+  },
+
+  async getNotifications() {
+    const res = await fetch(`${API_BASE}/our-voice-our-issue/notifications`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.notifications || [];
+  }
+};
+
 

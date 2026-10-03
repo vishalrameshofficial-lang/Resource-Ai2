@@ -24,6 +24,7 @@ import commandCenterRouter from './routes/commandCenter.js';
 import auditLogsRouter from './routes/auditLogs.js';
 import reportsRouter from './routes/reports.js';
 import complaintDispatchRouter from './routes/complaintDispatch.js';
+import ourVoiceRouter from './routes/ourVoice.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,6 +64,7 @@ app.use('/api/command-center', commandCenterRouter);
 app.use('/api/audit-logs', auditLogsRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/complaint-dispatch', complaintDispatchRouter);
+app.use('/api/our-voice-our-issue', ourVoiceRouter);
 
 // 5. Server-Sent Events (SSE) for Real-Time Dashboard Updates
 app.get('/api/events', (req, res) => {

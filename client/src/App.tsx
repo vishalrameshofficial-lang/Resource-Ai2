@@ -38,6 +38,7 @@ import { AuditLogsView } from './components/audit/AuditLogsView';
 import { ReportsView } from './components/reports/ReportsView';
 import { ComplaintDispatchView } from './components/calls/ComplaintDispatchView';
 import { LandingPage } from './components/landing/LandingPage';
+import { OurVoiceOurIssueModule } from './components/ourVoice/OurVoiceOurIssueModule';
 
 function AppContent() {
   const [viewMode, setViewMode] = useState<'landing' | 'dashboard'>('landing');
@@ -116,7 +117,16 @@ function AppContent() {
   }, [notification]);
 
   if (viewMode === 'landing') {
-    return <LandingPage onEnterDashboard={() => setViewMode('dashboard')} />;
+    return (
+      <LandingPage
+        onEnterDashboard={(targetTab?: string) => {
+          if (targetTab) {
+            setActiveTab(targetTab);
+          }
+          setViewMode('dashboard');
+        }}
+      />
+    );
   }
 
   return (
@@ -429,6 +439,13 @@ function AppContent() {
           {activeTab === 'citizen' && (
             <div className="max-w-7xl mx-auto">
               <CitizenIntakeForm />
+            </div>
+          )}
+
+          {/* TAB: OUR VOICE OUR ISSUE CIVIC GRIEVANCE & TELEPHONY */}
+          {activeTab === 'our-voice-our-issue' && (
+            <div className="max-w-7xl mx-auto">
+              <OurVoiceOurIssueModule />
             </div>
           )}
 

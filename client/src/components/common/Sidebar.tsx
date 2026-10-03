@@ -9,7 +9,8 @@ import {
   GraduationCap,
   HeartPulse,
   FileSpreadsheet,
-  Siren
+  Siren,
+  Megaphone
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -54,11 +55,26 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
   ];
 
   const platformNav = [
+    {
+      id: 'our-voice-our-issue',
+      label: 'Our Voice Our Issue',
+      icon: Megaphone,
+      badge: 'Unified',
+      badgeColor: 'bg-indigo-600'
+    },
     { id: 'reports', label: 'Official Reports', icon: FileSpreadsheet },
-    { id: 'citizen', label: 'Citizen Portal', icon: FileText }
+    { id: 'citizen', label: 'Emergency Intake', icon: FileText }
   ];
 
-  const renderNavGroup = (items: typeof domainNav) => (
+  interface NavItem {
+    id: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string | number;
+    badgeColor?: string;
+  }
+
+  const renderNavGroup = (items: NavItem[]) => (
     <div className="space-y-1">
       {items.map((item) => {
         const Icon = item.icon;
