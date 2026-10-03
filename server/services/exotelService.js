@@ -15,7 +15,7 @@ export class ExotelService {
     this.subdomain = (process.env.EXOTEL_SUBDOMAIN || process.env.EXOTEL_REGION || 'api.exotel.com').trim();
     this.webhookSecret = (process.env.EXOTEL_WEBHOOK_SECRET || '').trim();
     this.publicHost = (process.env.PUBLIC_HOST || '').trim();
-    this.publicBaseUrl = (process.env.PUBLIC_BASE_URL || 'http://localhost:5055').trim();
+    this.publicBaseUrl = (process.env.PUBLIC_BASE_URL || 'http://localhost:3000').trim();
     this.audioCodec = (process.env.EXOTEL_AUDIO_CODEC || 'audio/l16').trim();
     this.sampleRate = parseInt(process.env.EXOTEL_SAMPLE_RATE || '8000', 10);
   }

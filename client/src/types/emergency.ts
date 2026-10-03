@@ -138,3 +138,50 @@ export interface ActiveLiveCall {
   requestId?: string | null;
   lastUtterance?: string;
 }
+
+export interface ComplaintDispatch {
+  id: string;
+  dispatch_id: string;
+  call_id?: string;
+  call_sid?: string;
+  request_id?: string;
+  caller_phone?: string;
+  department: string;
+  station_name: string;
+  station_jurisdiction?: string;
+  station_phone?: string;
+  station_email?: string;
+  emergency_number?: string;
+  response_unit?: string;
+  priority: string;
+  location?: string;
+  affected_people?: string;
+  summary?: string;
+  query?: string;
+  required_service?: string;
+  required_resources: string[];
+  language?: string;
+  confidence?: number;
+  complaint_document: string;
+  transcript_text?: string;
+  dispatch_status: 'DISPATCHED' | 'ACKNOWLEDGED' | 'RESOLVED';
+  response_time_estimate?: string;
+  escalation_officer?: string;
+  department_acknowledged: boolean;
+  acknowledged_at?: string;
+  resolved: boolean;
+  resolved_at?: string;
+  resolution_notes?: string;
+  created_at: string;
+}
+
+export interface ComplaintDispatchStats {
+  total: number;
+  dispatched: number;
+  acknowledged: number;
+  resolved: number;
+  critical: number;
+  pendingResponse: number;
+  byDepartment: Array<{ department: string; count: number }>;
+  byStatus: Array<{ status: string; count: number }>;
+}

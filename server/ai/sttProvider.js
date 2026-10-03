@@ -78,7 +78,7 @@ export class LocalWhisperSTTProvider extends SpeechToTextProvider {
     // 1. Primary path: Fast HTTP Daemon (if running, pre-warmed in memory)
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
       const headers = { 'Content-Type': 'audio/wav' };
       if (isoCode) {
@@ -98,9 +98,12 @@ export class LocalWhisperSTTProvider extends SpeechToTextProvider {
         const transcription = (data.text || '').trim();
         console.log(`[STT:LocalWhisper] Transcription result: "${transcription}"`);
         return transcription;
+      } else {
+        const errText = await response.text();
+        console.warn(`[STT:LocalWhisper] Daemon returned HTTP ${response.status}: ${errText.slice(0, 100)}`);
       }
-    } catch {
-      // Daemon not reachable; seamlessly fallback to on-demand CLI execution
+    } catch (daemonErr) {
+      console.warn('[STT:LocalWhisper] Daemon communication notice:', daemonErr.message);
     }
 
     // 2. Fallback path: Execute faster-whisper via Python CLI

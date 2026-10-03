@@ -23,6 +23,7 @@ import healthResourcesRouter from './routes/healthResources.js';
 import commandCenterRouter from './routes/commandCenter.js';
 import auditLogsRouter from './routes/auditLogs.js';
 import reportsRouter from './routes/reports.js';
+import complaintDispatchRouter from './routes/complaintDispatch.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +62,7 @@ app.use('/api/health-resources', healthResourcesRouter);
 app.use('/api/command-center', commandCenterRouter);
 app.use('/api/audit-logs', auditLogsRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/complaint-dispatch', complaintDispatchRouter);
 
 // 5. Server-Sent Events (SSE) for Real-Time Dashboard Updates
 app.get('/api/events', (req, res) => {
@@ -89,7 +91,7 @@ for (const candidate of clientDistCandidates) {
   }
 }
 
-if (clientDistPath) {
+if (process.env.NODE_ENV === 'production' && clientDistPath) {
   app.use(express.static(clientDistPath));
   
   // SPA Fallback for client-side routing (non-API routes)
@@ -102,6 +104,14 @@ if (clientDistPath) {
       return res.sendFile(indexPath);
     }
     next();
+  });
+} else {
+  // In development, redirect non-API UI requests on port 5055 to port 3000 where the live Vite React UI runs
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.redirect('http://localhost:3000' + req.originalUrl);
   });
 }
 

@@ -8,7 +8,11 @@ import os
 import io
 import json
 import argparse
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import socket
+from http.server import HTTPServer, ThreadingHTTPServer, BaseHTTPRequestHandler
+
+# Set default socket timeout so hanging connections never deadlock the server
+socket.setdefaulttimeout(15.0)
 
 # Import faster_whisper with error handling
 try:
@@ -52,7 +56,8 @@ def get_model(model_size=DEFAULT_MODEL, device=DEFAULT_DEVICE, compute_type=DEFA
     if _model_instance is None:
         if not WHISPER_AVAILABLE:
             raise RuntimeError(f"faster-whisper is not installed: {IMPORT_ERROR}")
-        _model_instance = WhisperModel(model_size, device=device, compute_type=compute_type)
+        threads = min(8, max(2, os.cpu_count() or 4))
+        _model_instance = WhisperModel(model_size, device=device, compute_type=compute_type, cpu_threads=threads)
     return _model_instance
 
 def normalize_language(lang_input):
@@ -83,11 +88,16 @@ def transcribe_audio(audio_data, language=None, model=None):
     else:
         audio_stream = audio_data
 
+    # Real-time telephony decoding parameters: greedy search, no timestamps, 0 condition overhead
     segments, info = model.transcribe(
         audio_stream,
         language=target_lang,
-        beam_size=5,
-        vad_filter=True
+        beam_size=1,
+        best_of=1,
+        temperature=0.0,
+        condition_on_previous_text=False,
+        without_timestamps=True,
+        vad_filter=False
     )
 
     text_parts = []
@@ -163,7 +173,7 @@ def run_server(port=5056, host="127.0.0.1"):
     # Pre-warm model in memory for instant responses
     print(f"[WhisperService] Pre-loading faster-whisper model '{DEFAULT_MODEL}' on {DEFAULT_DEVICE} ({DEFAULT_COMPUTE_TYPE})...", flush=True)
     get_model()
-    server = HTTPServer((host, port), WhisperHTTPHandler)
+    server = ThreadingHTTPServer((host, port), WhisperHTTPHandler)
     print(f"[WhisperService] Faster-Whisper STT HTTP service listening on http://{host}:{port}", flush=True)
     try:
         server.serve_forever()

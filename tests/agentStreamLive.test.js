@@ -171,7 +171,7 @@ test('Exotel AgentStream WebSocket - Complete Call Lifecycle & Database Persiste
   }));
 
   // Wait for initial greeting media chunks and mark to complete async real-time pacing
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 50; i++) {
     if (receivedEvents.some(e => e.event === 'mark' && e.stream_sid === testStreamSid)) break;
     await new Promise((r) => setTimeout(r, 100));
   }

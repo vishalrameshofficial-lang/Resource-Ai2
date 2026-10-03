@@ -2,38 +2,106 @@
 
 @layer base {
   body {
-    background-color: #020617;
-    color: #f8fafc;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
-/* Glassmorphism & Custom Accents */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+/* 3D Glassmorphism & Light Theme UI Tokens */
+.glass-panel-3d, .glass-panel {
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 
+    0 10px 30px -5px rgba(15, 23, 42, 0.05),
+    0 4px 12px -2px rgba(59, 130, 246, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  color: #0f172a;
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.5);
+.glass-card-3d, .glass-card {
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 
+    0 4px 15px -1px rgba(15, 23, 42, 0.04),
+    0 2px 6px -1px rgba(59, 130, 246, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  color: #0f172a;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-input {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f8fafc;
+.glass-card-3d:hover, .glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 25px -5px rgba(15, 23, 42, 0.08),
+    0 4px 12px -2px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
 }
-.glass-input:focus {
-  border-color: #3b82f6;
+
+.glass-input-3d, .glass-input {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  box-shadow: inset 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+}
+
+.glass-input-3d:focus, .glass-input:focus {
+  border-color: #2563eb;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  background: #ffffff;
+  box-shadow: 
+    0 0 0 3px rgba(37, 99, 235, 0.15),
+    inset 0 1px 2px 0 rgba(15, 23, 42, 0.02);
+}
+
+/* Centralized Readability & High Contrast Utility Classes */
+.text-contrast-primary {
+  color: #0f172a !important;
+}
+
+.text-contrast-secondary {
+  color: #334155 !important;
+}
+
+.text-contrast-muted {
+  color: #475569 !important;
+}
+
+/* Ensure Form Options Have Crisp Text & Visible Backgrounds */
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* 3D Department Tile Lighting */
+.dept-tile-3d {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 
+    0 6px 16px -2px rgba(15, 23, 42, 0.05),
+    0 2px 6px -1px rgba(59, 130, 246, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dept-tile-3d:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 
+    0 16px 32px -6px rgba(15, 23, 42, 0.1),
+    0 4px 12px -2px rgba(59, 130, 246, 0.12),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
 }
 
 /* Leaflet Google-Style Operations Map */
@@ -41,7 +109,7 @@
   width: 100%;
   height: 100%;
   border-radius: 0.75rem;
-  background: #0f172a !important;
+  background: #f8fafc !important;
 }
 
 .leaflet-control-attribution {
@@ -49,11 +117,11 @@
 }
 
 .google-style-popup .leaflet-popup-content-wrapper {
-  background: #0f172a !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
   border-radius: 0.75rem !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
   padding: 0 !important;
   overflow: hidden !important;
 }
@@ -64,12 +132,12 @@
 }
 
 .google-style-popup .leaflet-popup-tip {
-  background: #0f172a !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
 }
 
 .google-style-popup a.leaflet-popup-close-button {
-  color: #94a3b8 !important;
+  color: #475569 !important;
   top: 8px !important;
   right: 8px !important;
   font-size: 16px !important;
@@ -77,7 +145,7 @@
   transition: color 0.15s ease;
 }
 .google-style-popup a.leaflet-popup-close-button:hover {
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 .custom-google-marker {
@@ -92,20 +160,20 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Light Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }
 
 /* Pulse animation for live voice bot */

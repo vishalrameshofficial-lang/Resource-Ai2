@@ -27,7 +27,6 @@ export function ReportsView() {
       if (endDate) params.append('endDate', endDate);
 
       const downloadUrl = `/api/reports/export?${params.toString()}`;
-      // Trigger download
       const response = await fetch(downloadUrl);
       if (!response.ok) {
         throw new Error('Export failed or no records available');
@@ -51,138 +50,147 @@ export function ReportsView() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
-      <div className="border-b border-slate-800 pb-4">
-        <h2 className="text-xl font-black text-white tracking-tight flex items-center space-x-2">
-          <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+      {/* Header */}
+      <div className="border-b border-slate-200 pb-4">
+        <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center space-x-2">
+          <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
           <span>Government Operations Reporting</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-500 font-medium mt-0.5">
           Generate and export official audit-compliant reports from real verified database records across all three operational domains.
         </p>
       </div>
 
-      {/* Domain Selection Tabs */}
+      {/* Domain Selection Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div
+        <button
           onClick={() => setDomain('emergency')}
-          className={`p-4 rounded-2xl border cursor-pointer transition ${
+          className={`p-5 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between space-y-3 glass-card-3d ${
             domain === 'emergency'
-              ? 'bg-red-950/30 border-red-500/50 shadow-lg shadow-red-950/20'
-              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+              ? 'border-red-500 bg-rose-50/70 shadow-md ring-2 ring-red-400'
+              : 'border-slate-200 bg-white hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl bg-red-100 border border-red-200 text-red-700 flex items-center justify-center font-bold">
               <AlertTriangle className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Emergency Response</h3>
-              <span className="text-[10px] text-slate-400">Exotel calls & incidents</span>
-            </div>
+            {domain === 'emergency' && <CheckCircle className="w-4 h-4 text-red-600" />}
           </div>
-          <p className="text-xs text-slate-400">
-            Export caller records, incident severity, geolocations, detected languages, and relief dispatch status.
-          </p>
-        </div>
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-sm">Emergency Response Domain</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Disaster telecommunication, triaged phone petitions & field dispatches.</p>
+          </div>
+        </button>
 
-        <div
+        <button
           onClick={() => setDomain('education')}
-          className={`p-4 rounded-2xl border cursor-pointer transition ${
+          className={`p-5 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between space-y-3 glass-card-3d ${
             domain === 'education'
-              ? 'bg-blue-950/30 border-blue-500/50 shadow-lg shadow-blue-950/20'
-              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+              ? 'border-blue-500 bg-blue-50/70 shadow-md ring-2 ring-blue-400'
+              : 'border-slate-200 bg-white hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl bg-blue-100 border border-blue-200 text-blue-700 flex items-center justify-center font-bold">
               <GraduationCap className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Education Resources</h3>
-              <span className="text-[10px] text-slate-400">School & college petitions</span>
-            </div>
+            {domain === 'education' && <CheckCircle className="w-4 h-4 text-blue-600" />}
           </div>
-          <p className="text-xs text-slate-400">
-            Export institution petitions, classroom/lab requirements, approvals, inventory deductions, and delivery confirmations.
-          </p>
-        </div>
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-sm">Education Resources Domain</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">School/college infrastructure requests, facility inventory & fulfillment orders.</p>
+          </div>
+        </button>
 
-        <div
+        <button
           onClick={() => setDomain('health')}
-          className={`p-4 rounded-2xl border cursor-pointer transition ${
+          className={`p-5 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between space-y-3 glass-card-3d ${
             domain === 'health'
-              ? 'bg-emerald-950/30 border-emerald-500/50 shadow-lg shadow-emerald-950/20'
-              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+              ? 'border-emerald-500 bg-emerald-50/70 shadow-md ring-2 ring-emerald-400'
+              : 'border-slate-200 bg-white hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold">
               <HeartPulse className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Health Resources</h3>
-              <span className="text-[10px] text-slate-400">Hospital & medicine requisitions</span>
-            </div>
+            {domain === 'health' && <CheckCircle className="w-4 h-4 text-emerald-600" />}
           </div>
-          <p className="text-xs text-slate-400">
-            Export hospital requisitions, ICU bed demands, medicine stock dispatch orders, and medical audit histories.
-          </p>
-        </div>
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-sm">Health Resources Domain</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Hospital supplies, clinical oxygen/ICU bed demand & medical logistics.</p>
+          </div>
+        </button>
       </div>
 
-      {/* Export Options Box */}
-      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-5">
-        <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-          <Download className="w-4 h-4 text-emerald-400" />
-          <span>Export Configuration — {domain.toUpperCase()}</span>
+      {/* Export Configurations Panel */}
+      <div className="glass-panel-3d p-6 rounded-2xl border border-slate-200 bg-white space-y-5 shadow-md">
+        <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+          <FileText className="w-4 h-4 text-blue-600" />
+          <span>Export Parameters & Format Configuration</span>
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Export File Format</label>
-            <select
-              value={format}
-              onChange={(e) => setFormat(e.target.value as 'csv' | 'json')}
-              className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200"
-            >
-              <option value="csv">CSV (Comma-Separated Spreadsheet)</option>
-              <option value="json">JSON (Structured Data Format)</option>
-            </select>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Export File Format</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setFormat('csv')}
+                className={`py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
+                  format === 'csv'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                CSV Table (.csv)
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormat('json')}
+                className={`py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
+                  format === 'json'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                JSON Data (.json)
+              </button>
+            </div>
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Start Date (Optional)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Start Date (Optional)</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">End Date (Optional)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">End Date (Optional)</label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-400 flex items-center space-x-2.5">
-          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>
-            Government Compliance Notice: This export query runs directly against official SQLite database records. An audit log entry will be recorded for this export.
-          </span>
-        </div>
+        <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+          <div className="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <span>Report includes full database schema fields, timestamp telemetry & audit IDs.</span>
+          </div>
 
-        <div className="flex justify-end pt-2">
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition disabled:opacity-50"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 transition flex items-center space-x-2 disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             <span>{isExporting ? 'Generating Report...' : `Export ${domain.toUpperCase()} Report`}</span>

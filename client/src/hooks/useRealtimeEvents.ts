@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export interface RealtimeEvent {
   type: 'NEW_REQUEST' | 'REQUEST_UPDATED' | 'CALL_STARTED' | 'CALL_UPDATED' | 'CALL_COMPLETED' | 'CALL_ENDED' | 'CONNECTED';
@@ -9,6 +9,11 @@ export interface RealtimeEvent {
 export function useRealtimeEvents(onEvent?: (event: RealtimeEvent) => void) {
   const [isConnected, setIsConnected] = useState(false);
   const [latestEvent, setLatestEvent] = useState<RealtimeEvent | null>(null);
+
+  const onEventRef = useRef(onEvent);
+  useEffect(() => {
+    onEventRef.current = onEvent;
+  }, [onEvent]);
 
   useEffect(() => {
     let eventSource: EventSource | null = null;
@@ -26,8 +31,8 @@ export function useRealtimeEvents(onEvent?: (event: RealtimeEvent) => void) {
           try {
             const parsed: RealtimeEvent = JSON.parse(e.data);
             setLatestEvent(parsed);
-            if (onEvent) {
-              onEvent(parsed);
+            if (onEventRef.current) {
+              onEventRef.current(parsed);
             }
           } catch (err) {
             console.warn('[SSE] Failed to parse message:', err);
@@ -37,12 +42,12 @@ export function useRealtimeEvents(onEvent?: (event: RealtimeEvent) => void) {
         eventSource.onerror = () => {
           setIsConnected(false);
           eventSource?.close();
-          // Auto reconnect after 3 seconds
-          reconnectTimeout = setTimeout(connect, 3000);
+          // Auto reconnect after 5 seconds if disconnected
+          reconnectTimeout = setTimeout(connect, 5000);
         };
       } catch (err) {
         console.warn('[SSE] Connection error:', err);
-        reconnectTimeout = setTimeout(connect, 4000);
+        reconnectTimeout = setTimeout(connect, 5000);
       }
     }
 
@@ -52,7 +57,7 @@ export function useRealtimeEvents(onEvent?: (event: RealtimeEvent) => void) {
       if (eventSource) eventSource.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [onEvent]);
+  }, []);
 
   return { isConnected, latestEvent };
 }

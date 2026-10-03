@@ -14,34 +14,34 @@ interface StatCardProps {
 export function StatCard({ title, value, subtitle, icon: Icon, color, badge, onClick }: StatCardProps) {
   const colorMap = {
     red: {
-      bg: 'bg-red-500/10 border-red-500/20 text-red-400',
-      iconBg: 'bg-red-500/20 text-red-400',
-      glow: 'shadow-red-500/10'
+      bg: 'bg-rose-100 text-rose-800 border-rose-200',
+      iconBg: 'bg-rose-500/10 text-rose-600 border-rose-200',
+      glow: 'shadow-rose-500/5'
     },
     amber: {
-      bg: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
-      iconBg: 'bg-amber-500/20 text-amber-400',
-      glow: 'shadow-amber-500/10'
+      bg: 'bg-amber-100 text-amber-800 border-amber-200',
+      iconBg: 'bg-amber-500/10 text-amber-600 border-amber-200',
+      glow: 'shadow-amber-500/5'
     },
     blue: {
-      bg: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-      iconBg: 'bg-blue-500/20 text-blue-400',
-      glow: 'shadow-blue-500/10'
+      bg: 'bg-blue-100 text-blue-800 border-blue-200',
+      iconBg: 'bg-blue-500/10 text-blue-600 border-blue-200',
+      glow: 'shadow-blue-500/5'
     },
     purple: {
-      bg: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
-      iconBg: 'bg-purple-500/20 text-purple-400',
-      glow: 'shadow-purple-500/10'
+      bg: 'bg-purple-100 text-purple-800 border-purple-200',
+      iconBg: 'bg-purple-500/10 text-purple-600 border-purple-200',
+      glow: 'shadow-purple-500/5'
     },
     cyan: {
-      bg: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
-      iconBg: 'bg-cyan-500/20 text-cyan-400',
-      glow: 'shadow-cyan-500/10'
+      bg: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      iconBg: 'bg-cyan-500/10 text-cyan-600 border-cyan-200',
+      glow: 'shadow-cyan-500/5'
     },
     emerald: {
-      bg: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-      iconBg: 'bg-emerald-500/20 text-emerald-400',
-      glow: 'shadow-emerald-500/10'
+      bg: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      iconBg: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
+      glow: 'shadow-emerald-500/5'
     }
   };
 
@@ -50,24 +50,24 @@ export function StatCard({ title, value, subtitle, icon: Icon, color, badge, onC
   return (
     <div
       onClick={onClick}
-      className={`glass-panel p-5 rounded-2xl border transition-all duration-200 hover:scale-[1.02] shadow-lg ${scheme.glow} ${
-        onClick ? 'cursor-pointer hover:border-slate-700' : ''
+      className={`glass-card-3d p-5 rounded-2xl border border-slate-200/80 transition-all duration-300 hover:scale-[1.02] shadow-md ${scheme.glow} ${
+        onClick ? 'cursor-pointer hover:border-blue-300' : ''
       }`}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{title}</p>
           <div className="flex items-baseline space-x-2 mt-2">
-            <h3 className="text-3xl font-extrabold text-white tracking-tight">{value}</h3>
+            <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">{value}</h3>
             {badge && (
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${scheme.bg}`}>
                 {badge}
               </span>
             )}
           </div>
-          {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-slate-500 font-medium mt-1">{subtitle}</p>}
         </div>
-        <div className={`p-3 rounded-xl border border-white/5 ${scheme.iconBg}`}>
+        <div className={`p-3 rounded-xl border ${scheme.iconBg} shadow-2xs`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

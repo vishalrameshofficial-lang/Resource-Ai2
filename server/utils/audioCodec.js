@@ -152,17 +152,35 @@ export function resamplePcm(pcmBuffer, fromRate, toRate = 8000) {
   const dstSamples = Math.floor(srcSamples / ratio);
   const out = Buffer.alloc(dstSamples * 2);
 
-  for (let i = 0; i < dstSamples; i++) {
-    const srcIdx = i * ratio;
-    const idx0 = Math.floor(srcIdx);
-    const idx1 = Math.min(idx0 + 1, srcSamples - 1);
-    const frac = srcIdx - idx0;
+  if (ratio > 1) {
+    // Downsampling with box-car anti-aliasing filter over window size of ratio
+    for (let i = 0; i < dstSamples; i++) {
+      const start = Math.floor(i * ratio);
+      const end = Math.min(Math.floor((i + 1) * ratio), srcSamples);
+      let sum = 0;
+      let count = 0;
+      for (let j = start; j < end; j++) {
+        sum += pcmBuffer.readInt16LE(j * 2);
+        count++;
+      }
+      const sample = count > 0 ? Math.round(sum / count) : 0;
+      const clamped = Math.max(-32768, Math.min(32767, sample));
+      out.writeInt16LE(clamped, i * 2);
+    }
+  } else {
+    // Upsampling with linear interpolation
+    for (let i = 0; i < dstSamples; i++) {
+      const srcIdx = i * ratio;
+      const idx0 = Math.floor(srcIdx);
+      const idx1 = Math.min(idx0 + 1, srcSamples - 1);
+      const frac = srcIdx - idx0;
 
-    const s0 = pcmBuffer.readInt16LE(idx0 * 2);
-    const s1 = pcmBuffer.readInt16LE(idx1 * 2);
-    const sample = Math.round(s0 + frac * (s1 - s0));
-    const clamped = Math.max(-32768, Math.min(32767, sample));
-    out.writeInt16LE(clamped, i * 2);
+      const s0 = pcmBuffer.readInt16LE(idx0 * 2);
+      const s1 = pcmBuffer.readInt16LE(idx1 * 2);
+      const sample = Math.round(s0 + frac * (s1 - s0));
+      const clamped = Math.max(-32768, Math.min(32767, sample));
+      out.writeInt16LE(clamped, i * 2);
+    }
   }
   return out;
 }

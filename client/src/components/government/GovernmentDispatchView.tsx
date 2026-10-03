@@ -73,47 +73,47 @@ export function GovernmentDispatchView({ requests, onSelectRequest, onRefresh }:
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner explaining safety distinction */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-blue-950/40 border border-purple-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header Info Panel */}
+      <div className="glass-panel-3d p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3.5">
+          <div className="p-3 rounded-xl bg-purple-100 border border-purple-200 text-purple-800">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white flex items-center space-x-2">
+            <h2 className="text-base font-extrabold text-slate-900 flex items-center space-x-2">
               <span>Government Emergency Dispatch & Coordination</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
                 AUDITED
               </span>
             </h2>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-600 font-medium mt-0.5">
               Strict boundary enforcement: requests remain labeled{' '}
-              <strong className="text-blue-400">"Recorded by ResourceAI"</strong> until an administrator records an official{' '}
-              <strong className="text-purple-400">Government Agency Reference Code</strong>.
+              <strong className="text-blue-700">"Recorded by ResourceAI"</strong> until an administrator records an official{' '}
+              <strong className="text-purple-700">Government Agency Reference Code</strong>.
             </p>
           </div>
         </div>
 
-        <div className="text-right text-xs text-slate-400 shrink-0">
-          <div>Govt Pending: <span className="font-bold text-amber-400">{verifiedQueue.length + forwardedToGovt.length}</span></div>
-          <div>Active Transit: <span className="font-bold text-cyan-400">{inTransit.length}</span></div>
+        <div className="text-right text-xs text-slate-600 font-medium shrink-0">
+          <div>Govt Pending: <span className="font-extrabold text-amber-700">{verifiedQueue.length + forwardedToGovt.length}</span></div>
+          <div>Active Transit: <span className="font-extrabold text-cyan-700">{inTransit.length}</span></div>
         </div>
       </div>
 
       {feedback && (
-        <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-200 text-xs flex items-center space-x-2">
-          <Shield className="w-4 h-4 shrink-0 text-blue-400" />
+        <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold flex items-center space-x-2 shadow-2xs">
+          <Shield className="w-4 h-4 shrink-0 text-blue-600" />
           <span>{feedback}</span>
         </div>
       )}
 
       {/* Action Dialog if a card is selected */}
       {selectedRequest && actionStage && (
-        <div className="glass-panel p-5 rounded-2xl border border-purple-500/40 space-y-4 bg-slate-900/90 shadow-2xl">
+        <div className="glass-panel-3d p-5 rounded-2xl border border-purple-200 space-y-4 bg-white shadow-xl">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Send className="w-4 h-4 text-purple-400" />
+            <h4 className="text-sm font-extrabold text-slate-900 flex items-center space-x-2">
+              <Send className="w-4 h-4 text-purple-600" />
               <span>
                 Action on {selectedRequest.request_id} ({selectedRequest.location}) - Step: {actionStage.toUpperCase()}
               </span>
@@ -123,7 +123,7 @@ export function GovernmentDispatchView({ requests, onSelectRequest, onRefresh }:
                 setSelectedRequest(null);
                 setActionStage(null);
               }}
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-xs font-bold text-slate-500 hover:text-slate-900"
             >
               Cancel
             </button>
@@ -133,13 +133,13 @@ export function GovernmentDispatchView({ requests, onSelectRequest, onRefresh }:
             {actionStage === 'forward' && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Government Agency:
                   </label>
                   <select
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-200"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     <option value="State Disaster Response Force (SDRF)">SDRF (State Disaster Response)</option>
                     <option value="National Disaster Response Force (NDRF)">NDRF (National Force)</option>
@@ -150,22 +150,22 @@ export function GovernmentDispatchView({ requests, onSelectRequest, onRefresh }:
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Official Reference Code <span className="text-red-400">*</span>:
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Official Reference Code <span className="text-rose-600">*</span>:
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. TN-SDRF-2026-9921"
                     value={govtRef}
                     onChange={(e) => setGovtRef(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-100 font-mono"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 font-mono font-bold"
                   />
                 </div>
               </>
             )}
 
             <div className={actionStage === 'forward' ? 'md:col-span-1' : 'md:col-span-3'}>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 Dispatch / Resource Notes:
               </label>
               <input
@@ -173,180 +173,163 @@ export function GovernmentDispatchView({ requests, onSelectRequest, onRefresh }:
                 placeholder="Details of vehicle, boat, squad or relief delivery notes..."
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-100"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900"
               />
             </div>
           </div>
 
-          <div className="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+          <div className="flex justify-end space-x-2">
             <button
-              onClick={() => {
-                setSelectedRequest(null);
-                setActionStage(null);
-              }}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              disabled={isProcessing}
               onClick={executeAction}
-              className="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition disabled:opacity-50"
+              disabled={isProcessing}
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-xs disabled:opacity-50"
             >
-              {isProcessing ? 'Recording...' : 'Confirm Government Step'}
+              {isProcessing ? 'Recording Official Dispatch...' : 'Confirm Dispatch Stage'}
             </button>
           </div>
         </div>
       )}
 
-      {/* Kanban / Pipeline Columns */}
+      {/* Kanban Pipeline Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Column 1: Awaiting Verification */}
-        <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <h4 className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              <span>1. New & Verified ({pendingVerification.length + verifiedQueue.length})</span>
-            </h4>
+        {/* Step 1: Verified Queue */}
+        <div className="glass-panel-3d p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span className="text-xs font-extrabold text-slate-800 flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+              <span>1. Verified Petitions</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-mono font-bold">
+              {verifiedQueue.length}
+            </span>
           </div>
 
-          <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
-            {[...pendingVerification, ...verifiedQueue].map((req) => (
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            {verifiedQueue.map((req) => (
               <div
                 key={req.id}
-                onClick={() => onSelectRequest(req)}
-                className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800/80 border border-slate-800 hover:border-blue-500/40 cursor-pointer transition shadow-sm space-y-2"
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 hover:border-blue-300 transition shadow-2xs"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-blue-400 text-xs">{req.request_id}</span>
+                <div className="flex items-center justify-between font-mono font-bold text-slate-900">
+                  <span>{req.request_id}</span>
                   <UrgencyBadge urgency={req.urgency} />
                 </div>
-                <p className="text-xs font-medium text-slate-200 line-clamp-1">{req.location}</p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400">
-                  <span>{req.affected_people_count} people affected</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedRequest(req);
-                      setActionStage('forward');
-                    }}
-                    className="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white text-[10px] font-semibold transition"
-                  >
-                    Forward to Govt →
-                  </button>
-                </div>
+                <p className="text-slate-700 font-semibold line-clamp-2">"{req.description}"</p>
+                <div className="text-[11px] text-slate-500 font-medium">{req.location}</div>
+                <button
+                  onClick={() => {
+                    setSelectedRequest(req);
+                    setActionStage('forward');
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition shadow-2xs"
+                >
+                  Forward to Govt &rarr;
+                </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Column 2: Forwarded / Accepted */}
-        <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <h4 className="text-xs font-bold text-purple-300 flex items-center space-x-1.5">
+        {/* Step 2: Forwarded & Accepted */}
+        <div className="glass-panel-3d p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span className="text-xs font-extrabold text-slate-800 flex items-center space-x-1.5">
               <span className="w-2 h-2 rounded-full bg-purple-500" />
-              <span>2. Forwarded to Govt ({forwardedToGovt.length})</span>
-            </h4>
+              <span>2. Govt Assigned</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-mono font-bold">
+              {forwardedToGovt.length}
+            </span>
           </div>
 
-          <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
             {forwardedToGovt.map((req) => (
               <div
                 key={req.id}
-                onClick={() => onSelectRequest(req)}
-                className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800/80 border border-purple-500/20 hover:border-purple-500/50 cursor-pointer transition shadow-sm space-y-2"
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 hover:border-purple-300 transition shadow-2xs"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-purple-300 text-xs">{req.request_id}</span>
+                <div className="flex items-center justify-between font-mono font-bold text-slate-900">
+                  <span>{req.request_id}</span>
                   <StatusBadge status={req.status} />
                 </div>
-                <p className="text-xs font-medium text-slate-200 line-clamp-1">{req.location}</p>
-                {req.government_reference && (
-                  <p className="text-[10px] font-mono text-purple-400 bg-purple-950/40 px-1.5 py-0.5 rounded border border-purple-800/40">
-                    Ref: {req.government_reference}
-                  </p>
-                )}
-                <div className="flex items-center justify-end pt-1">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedRequest(req);
-                      setActionStage('allocate');
-                    }}
-                    className="px-2 py-0.5 rounded bg-amber-600/30 hover:bg-amber-600 text-amber-300 hover:text-white text-[10px] font-semibold transition"
-                  >
-                    Allocate Units →
-                  </button>
+                <div className="p-2 rounded bg-purple-50 border border-purple-200 text-purple-900 font-mono text-[10px] font-bold">
+                  Govt Ref: {req.government_reference || 'Ref Pending'}
                 </div>
+                <button
+                  onClick={() => {
+                    setSelectedRequest(req);
+                    setActionStage('allocate');
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] transition shadow-2xs"
+                >
+                  Allocate Supplies &rarr;
+                </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Column 3: Resource Allocated & In Transit */}
-        <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <h4 className="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full bg-orange-500" />
-              <span>3. Dispatch & Transit ({inAllocation.length + inTransit.length})</span>
-            </h4>
+        {/* Step 3: Allocated & In Transit */}
+        <div className="glass-panel-3d p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span className="text-xs font-extrabold text-slate-800 flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-500" />
+              <span>3. In Transit</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-mono font-bold">
+              {inAllocation.length + inTransit.length}
+            </span>
           </div>
 
-          <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
             {[...inAllocation, ...inTransit].map((req) => (
               <div
                 key={req.id}
-                onClick={() => onSelectRequest(req)}
-                className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800/80 border border-orange-500/20 hover:border-orange-500/50 cursor-pointer transition shadow-sm space-y-2"
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 hover:border-cyan-300 transition shadow-2xs"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-orange-300 text-xs">{req.request_id}</span>
+                <div className="flex items-center justify-between font-mono font-bold text-slate-900">
+                  <span>{req.request_id}</span>
                   <StatusBadge status={req.status} />
                 </div>
-                <p className="text-xs font-medium text-slate-200 line-clamp-1">{req.location}</p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400">
-                  <span>{req.affected_people_count} People</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedRequest(req);
-                      setActionStage(req.status === 'RESOURCE_ALLOCATED' ? 'transit' : 'delivered');
-                    }}
-                    className="px-2 py-0.5 rounded bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white text-[10px] font-semibold transition"
-                  >
-                    {req.status === 'RESOURCE_ALLOCATED' ? 'In Transit →' : 'Mark Delivered ✓'}
-                  </button>
-                </div>
+                <p className="text-slate-700 font-semibold line-clamp-1">{req.location}</p>
+                <button
+                  onClick={() => {
+                    setSelectedRequest(req);
+                    setActionStage(req.status === 'RESOURCE_ALLOCATED' ? 'transit' : 'delivered');
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-[11px] transition shadow-2xs"
+                >
+                  {req.status === 'RESOURCE_ALLOCATED' ? 'Dispatch Convoy →' : 'Mark Delivered ✓'}
+                </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Column 4: Delivered / Resolved */}
-        <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <h4 className="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
+        {/* Step 4: Resolved & Delivered */}
+        <div className="glass-panel-3d p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span className="text-xs font-extrabold text-slate-800 flex items-center space-x-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>4. Delivered & Resolved ({delivered.length})</span>
-            </h4>
+              <span>4. Resolved & Delivered</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-mono font-bold">
+              {delivered.length}
+            </span>
           </div>
 
-          <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
             {delivered.map((req) => (
               <div
                 key={req.id}
-                onClick={() => onSelectRequest(req)}
-                className="p-3 rounded-xl bg-slate-900/60 border border-emerald-500/20 cursor-pointer transition hover:bg-slate-800/80 space-y-1.5"
+                className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 text-xs space-y-1.5 shadow-2xs"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-emerald-400 text-xs">{req.request_id}</span>
-                  <StatusBadge status={req.status} />
+                <div className="flex items-center justify-between font-mono font-bold text-slate-900">
+                  <span>{req.request_id}</span>
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
                 </div>
-                <p className="text-xs font-medium text-slate-200 line-clamp-1">{req.location}</p>
-                <p className="text-[10px] text-slate-400 flex items-center space-x-1">
-                  <CheckCircle className="w-3 h-3 text-emerald-400" />
-                  <span>Resolved: {formatDate(req.updated_at)}</span>
-                </p>
+                <div className="text-[11px] text-emerald-900 font-bold">{req.location}</div>
+                <div className="text-[10px] font-mono text-emerald-700 font-bold">Ref: {req.government_reference}</div>
               </div>
             ))}
           </div>

@@ -142,42 +142,42 @@ export function CitizenIntakeForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-900/60 via-indigo-900/50 to-slate-900 border border-blue-500/40 text-center space-y-4 shadow-2xl">
-        <div className="w-12 h-12 rounded-xl bg-blue-600/30 border border-blue-400/40 mx-auto flex items-center justify-center text-blue-400">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-50 via-white to-cyan-50 border border-blue-200 text-center space-y-4 shadow-md glass-panel-3d">
+        <div className="w-12 h-12 rounded-xl bg-blue-100 border border-blue-200 mx-auto flex items-center justify-center text-blue-600">
           <ShieldAlert className="w-6 h-6 animate-pulse" />
         </div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Citizen Emergency Assistance Intake
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-lg mx-auto mt-1">
             Need immediate disaster assistance? Fill out this emergency form or call our 24/7 AI helpline directly.
-            Web submissions work <strong className="text-emerald-400">even if offline</strong>.
+            Web submissions work <strong className="text-emerald-600">even if offline</strong>.
           </p>
         </div>
 
         {/* Prominent Direct Phone Helpline Callout */}
-        <div className="max-w-2xl mx-auto p-4 rounded-xl bg-slate-950/80 border border-emerald-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg">
+        <div className="max-w-2xl mx-auto p-4 rounded-xl bg-white border border-emerald-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-2xs">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
               <Phone className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <span className="text-xs font-bold text-white block">Prefer to speak by phone?</span>
-              <span className="text-[11px] text-slate-400 block">Multilingual AI voice assistance in 8 Indian languages</span>
+              <span className="text-xs font-extrabold text-slate-900 block">Prefer to speak by phone?</span>
+              <span className="text-[11px] text-slate-500 font-semibold block">Multilingual AI voice assistance in 8 Indian languages</span>
             </div>
           </div>
 
           <div className="flex items-center space-x-2.5 w-full sm:w-auto justify-between sm:justify-end">
-            <span className="font-mono text-sm sm:text-base font-black text-emerald-400 tracking-wide">
+            <span className="font-mono text-sm sm:text-base font-black text-emerald-700 tracking-wide">
               +91 44 4761 5477
             </span>
             <a
               href="tel:+914447615477"
               aria-label="Call Emergency Support at +91 44 4761 5477"
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] border border-emerald-400/40 whitespace-nowrap"
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all whitespace-nowrap"
             >
               <Phone className="w-3.5 h-3.5" />
               <span>Call Emergency Support</span>
@@ -188,15 +188,15 @@ export function CitizenIntakeForm() {
 
       {/* Offline Queue Status Tray */}
       {queue.length > 0 && (
-        <div className="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 space-y-3">
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-amber-300 flex items-center space-x-2">
-              <WifiOff className="w-4 h-4 text-amber-400" />
+            <h4 className="text-xs font-extrabold text-amber-900 flex items-center space-x-2">
+              <WifiOff className="w-4 h-4 text-amber-600" />
               <span>Offline & In-Flight Dispatch Queue ({queue.length} items)</span>
             </h4>
             <button
               onClick={() => emergencyQueue.processQueue()}
-              className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-semibold flex items-center space-x-1"
+              className="px-2.5 py-1 rounded bg-amber-200 hover:bg-amber-300 text-amber-900 text-[11px] font-bold flex items-center space-x-1"
             >
               <RefreshCw className="w-3 h-3" />
               <span>Retry Sync</span>
@@ -207,30 +207,30 @@ export function CitizenIntakeForm() {
             {queue.map((item) => (
               <div
                 key={item.tempId}
-                className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+                className="p-3 rounded-xl bg-white border border-amber-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs"
               >
                 <div>
-                  <div className="font-semibold text-slate-200">
+                  <div className="font-bold text-slate-900">
                     {item.payload.location} ({item.payload.category})
                   </div>
-                  <div className="text-[11px] text-slate-400">
+                  <div className="text-[11px] text-slate-500 font-semibold">
                     Queued: {new Date(item.queuedAt).toLocaleTimeString()} · Attempts: {item.attempts}
                   </div>
                 </div>
 
                 <div>
                   {item.deliveryStatus === 'CONFIRMED' ? (
-                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-[11px]">
+                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[11px]">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Confirmed: {item.confirmedRequestId}</span>
                     </span>
                   ) : item.deliveryStatus === 'SYNCING' ? (
-                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[11px]">
+                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-300 font-bold text-[11px]">
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                       <span>Syncing with ResourceAI...</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold text-[11px]">
+                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-bold text-[11px]">
                       <Clock className="w-3.5 h-3.5" />
                       <span>Saved locally — waiting for network</span>
                     </span>
@@ -243,11 +243,11 @@ export function CitizenIntakeForm() {
       )}
 
       {/* Main Intake Form */}
-      <form onSubmit={handleSubmit} className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
+      <form onSubmit={handleSubmit} className="glass-panel-3d p-6 rounded-2xl border border-slate-200 bg-white space-y-5 shadow-md">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Caller Name */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
               Your Name (Optional):
             </label>
             <input
@@ -255,14 +255,14 @@ export function CitizenIntakeForm() {
               placeholder="e.g. Ramesh Kumar"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             />
           </div>
 
           {/* Caller Phone */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Contact Phone Number <span className="text-red-400">*</span>:
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+              Contact Phone Number <span className="text-rose-600">*</span>:
             </label>
             <input
               type="tel"
@@ -270,19 +270,19 @@ export function CitizenIntakeForm() {
               placeholder="e.g. +91 98765 43210"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 font-mono focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 font-mono font-bold focus:outline-none focus:border-blue-500 shadow-2xs"
             />
           </div>
 
           {/* Language Preference */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
               Preferred Language:
             </label>
             <select
               value={formData.language}
               onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             >
               {['English', 'Hindi', 'Tamil', 'Telugu', 'Malayalam', 'Kannada', 'Bengali', 'Odia'].map((l) => (
                 <option key={l} value={l}>{l}</option>
@@ -292,13 +292,13 @@ export function CitizenIntakeForm() {
 
           {/* Category */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
               Emergency Category:
             </label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 capitalize focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 capitalize focus:outline-none focus:border-blue-500 shadow-2xs"
             >
               <option value="flood">Flood</option>
               <option value="landslide">Landslide</option>
@@ -315,16 +315,16 @@ export function CitizenIntakeForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-300">
-                Current Location / Area <span className="text-red-400">*</span>:
+              <label className="text-xs font-extrabold text-slate-700">
+                Current Location / Area <span className="text-rose-600">*</span>:
               </label>
               <button
                 type="button"
                 onClick={handleGetLocation}
                 disabled={isLocating}
-                className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+                className="text-[11px] text-blue-700 hover:text-blue-800 font-bold flex items-center space-x-1"
               >
-                <MapPin className="w-3 h-3" />
+                <MapPin className="w-3 h-3 text-rose-500" />
                 <span>{isLocating ? 'Locating...' : 'Use My GPS'}</span>
               </button>
             </div>
@@ -334,12 +334,12 @@ export function CitizenIntakeForm() {
               placeholder="e.g. Kurukkuthoorai, Tirunelveli"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
               Nearby Landmark:
             </label>
             <input
@@ -347,63 +347,63 @@ export function CitizenIntakeForm() {
               placeholder="e.g. Near Murugan Temple Ghat"
               value={formData.landmark}
               onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             />
           </div>
         </div>
 
-        {/* Number of affected people & Urgency */}
+        {/* Affected People & Urgency */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Number of People Affected / Stranded:
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+              Number of Affected People:
             </label>
             <input
               type="number"
-              min="1"
-              max="5000"
+              min={1}
               value={formData.affectedPeople}
-              onChange={(e) => setFormData({ ...formData, affectedPeople: parseInt(e.target.value, 10) || 1 })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              onChange={(e) => setFormData({ ...formData, affectedPeople: Math.max(1, parseInt(e.target.value, 10) || 1) })}
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-extrabold text-slate-700 mb-1">
               Urgency Level:
             </label>
             <select
               value={formData.urgency}
               onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
             >
-              <option value="CRITICAL">CRITICAL (Life-Threatening / Trapped)</option>
-              <option value="HIGH">HIGH (Severe Flood / Rising Water)</option>
-              <option value="MEDIUM">MEDIUM (Needs Food & Water within 24h)</option>
-              <option value="LOW">LOW (General Inquiry / Stable)</option>
+              <option value="CRITICAL">Critical (Life Threatening)</option>
+              <option value="HIGH">High Urgency</option>
+              <option value="MEDIUM">Medium Urgency</option>
+              <option value="LOW">Low Urgency</option>
             </select>
           </div>
         </div>
 
-        {/* Resources Needed Checkboxes */}
+        {/* Requirements Selection Checklist */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-2">
-            Resources Needed:
+          <label className="block text-xs font-extrabold text-slate-700 mb-2">
+            Select Needed Relief Supplies & Services:
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          <div className="flex flex-wrap gap-2">
             {resourceOptions.map((res) => {
               const isSelected = formData.selectedResources.includes(res);
               return (
                 <button
-                  type="button"
                   key={res}
+                  type="button"
                   onClick={() => toggleResource(res)}
-                  className={`p-2 rounded-xl text-xs font-medium border text-left transition ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
                     isSelected
-                      ? 'bg-blue-600/30 border-blue-500 text-blue-200'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                      : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
                   }`}
                 >
+                  {isSelected ? '✓ ' : '+ '}
                   {res}
                 </button>
               );
@@ -411,42 +411,42 @@ export function CitizenIntakeForm() {
           </div>
         </div>
 
+        {/* Description Textarea */}
+        <div>
+          <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            Describe Your Emergency & Situation:
+          </label>
+          <textarea
+            rows={3}
+            placeholder="Explain the water level, road blockage, medical emergency, or immediate assistance needed..."
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-2xs"
+          />
+        </div>
+
         {/* Immediate Danger Checkbox */}
-        <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5 p-3.5 rounded-xl bg-rose-50 border border-rose-200">
           <input
             type="checkbox"
             id="immediateDanger"
             checked={formData.immediateDanger}
             onChange={(e) => setFormData({ ...formData, immediateDanger: e.target.checked })}
-            className="w-4 h-4 rounded text-red-600 focus:ring-red-500"
+            className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
           />
-          <label htmlFor="immediateDanger" className="text-xs text-red-200 font-semibold cursor-pointer">
-            Immediate life-threatening danger exists (e.g. rising water rapidly entering, trapped under debris).
+          <label htmlFor="immediateDanger" className="text-xs font-extrabold text-rose-900 cursor-pointer">
+            Immediate Risk to Life / Stranded in High Water Level (Flag High Priority Triage)
           </label>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
-            Brief Description of Emergency:
-          </label>
-          <textarea
-            rows={3}
-            placeholder="Describe what happened, water level, current safety, or specific instructions for rescue responders..."
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500"
-          />
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center justify-center space-x-2 disabled:opacity-50"
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:opacity-95 text-white font-extrabold text-sm shadow-md shadow-blue-500/20 transition flex items-center justify-center space-x-2 disabled:opacity-50"
         >
           <Send className="w-4 h-4" />
-          <span>{isSubmitting ? 'Recording Emergency...' : 'Submit Emergency Assistance Request'}</span>
+          <span>{isSubmitting ? 'Submitting Petition...' : 'Submit Emergency Relief Petition'}</span>
         </button>
       </form>
     </div>

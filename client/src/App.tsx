@@ -36,8 +36,11 @@ import { EducationDashboardView } from './components/education/EducationDashboar
 import { HealthDashboardView } from './components/health/HealthDashboardView';
 import { AuditLogsView } from './components/audit/AuditLogsView';
 import { ReportsView } from './components/reports/ReportsView';
+import { ComplaintDispatchView } from './components/calls/ComplaintDispatchView';
+import { LandingPage } from './components/landing/LandingPage';
 
 function AppContent() {
+  const [viewMode, setViewMode] = useState<'landing' | 'dashboard'>('landing');
   const [activeTab, setActiveTab] = useState('command-center');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [requests, setRequests] = useState<EmergencyRequest[]>([]);
@@ -66,6 +69,11 @@ function AppContent() {
 
   useEffect(() => {
     fetchData();
+    // Fast 2-second polling interval for active calls to ensure instant UI updates on port 3000
+    const interval = setInterval(() => {
+      api.getActiveCalls().then(setActiveCalls).catch(() => {});
+    }, 2000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   // Real-time Server-Sent Events listener
@@ -107,14 +115,19 @@ function AppContent() {
     }
   }, [notification]);
 
+  if (viewMode === 'landing') {
+    return <LandingPage onEnterDashboard={() => setViewMode('dashboard')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isRealtimeConnected={isRealtimeConnected}
         liveCallsCount={activeCalls.length}
+        onReturnToLanding={() => setViewMode('landing')}
       />
 
       {/* Real-time Notification Banner */}
@@ -375,6 +388,13 @@ function AppContent() {
                 onSelectRequest={(r) => setSelectedRequest(r)}
                 onRefresh={fetchData}
               />
+            </div>
+          )}
+
+          {/* COMPLAINT DISPATCH CENTER */}
+          {activeTab === 'complaint-dispatch' && (
+            <div className="max-w-7xl mx-auto">
+              <ComplaintDispatchView />
             </div>
           )}
 

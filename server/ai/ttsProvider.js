@@ -76,11 +76,21 @@ export class LocalTTSProvider extends TextToSpeechProvider {
         throw new Error('TTS output file is empty or corrupted');
       }
 
-      // Parse source sample rate from standard WAV header (offset 24, 4 bytes LE)
-      const srcSampleRate = wavBuffer.readUInt32LE(24) || 22050;
-      const rawPcm = wavBuffer.subarray(44);
+      // Accurately parse source sample rate from 'fmt ' chunk and extract PCM from 'data' chunk
+      let srcSampleRate = targetRate;
+      const fmtIdx = wavBuffer.indexOf(Buffer.from('fmt '));
+      if (fmtIdx !== -1 && fmtIdx + 16 <= wavBuffer.length) {
+        srcSampleRate = wavBuffer.readUInt32LE(fmtIdx + 12) || targetRate;
+      }
 
-      // Resample to target rate (default 8000Hz for Exotel)
+      let rawPcm = wavBuffer.subarray(44);
+      const dataIdx = wavBuffer.indexOf(Buffer.from('data'));
+      if (dataIdx !== -1 && dataIdx + 8 <= wavBuffer.length) {
+        const dataSize = wavBuffer.readUInt32LE(dataIdx + 4);
+        rawPcm = wavBuffer.subarray(dataIdx + 8, dataSize > 0 ? Math.min(wavBuffer.length, dataIdx + 8 + dataSize) : undefined);
+      }
+
+      // Resample to target rate (default 8000Hz for Exotel telephony)
       const pcmTarget = resamplePcm(rawPcm, srcSampleRate, targetRate);
       if (pcmTarget && pcmTarget.length > 0) {
         ttsAudioCache.set(cacheKey, pcmTarget);

@@ -36,40 +36,40 @@ export function formatDate(isoString: string) {
 export function getUrgencyBadgeColor(urgency: UrgencyLevel) {
   switch (urgency) {
     case 'CRITICAL':
-      return 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse';
+      return 'bg-rose-100 text-rose-800 border-rose-300 font-extrabold animate-pulse';
     case 'HIGH':
-      return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+      return 'bg-amber-100 text-amber-800 border-amber-300 font-extrabold';
     case 'MEDIUM':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40';
+      return 'bg-blue-100 text-blue-800 border-blue-300 font-bold';
     case 'LOW':
-      return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+      return 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
     default:
-      return 'bg-slate-700 text-slate-300 border-slate-600';
+      return 'bg-slate-100 text-slate-800 border-slate-300 font-bold';
   }
 }
 
 export function getStatusBadgeColor(status: RequestStatus) {
   switch (status) {
     case 'NEW':
-      return 'bg-blue-500/20 text-blue-400 border-blue-500/40';
+      return 'bg-blue-100 text-blue-800 border-blue-300 font-bold';
     case 'VERIFIED':
-      return 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40';
+      return 'bg-indigo-100 text-indigo-800 border-indigo-300 font-bold';
     case 'FORWARDED_TO_GOVERNMENT':
-      return 'bg-purple-500/20 text-purple-400 border-purple-500/40';
+      return 'bg-purple-100 text-purple-800 border-purple-300 font-bold';
     case 'ACCEPTED':
-      return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40';
+      return 'bg-cyan-100 text-cyan-800 border-cyan-300 font-bold';
     case 'RESOURCE_ALLOCATED':
-      return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+      return 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
     case 'DELIVERY_IN_PROGRESS':
-      return 'bg-orange-500/20 text-orange-400 border-orange-500/40';
+      return 'bg-orange-100 text-orange-800 border-orange-300 font-bold';
     case 'DELIVERED':
-      return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+      return 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
     case 'REJECTED':
-      return 'bg-slate-700 text-slate-400 border-slate-600';
+      return 'bg-rose-100 text-rose-800 border-rose-300 font-bold';
     case 'CANCELLED':
-      return 'bg-red-900/30 text-red-400 border-red-800';
+      return 'bg-slate-200 text-slate-800 border-slate-300 font-bold';
     default:
-      return 'bg-slate-700 text-slate-300 border-slate-600';
+      return 'bg-slate-100 text-slate-800 border-slate-300 font-bold';
   }
 }
 

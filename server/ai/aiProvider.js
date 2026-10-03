@@ -77,8 +77,11 @@ export class AIProvider {
         };
       }
 
-      const isNegative = /\b(no|nope|wrong|incorrect|not\s+correct|not\s+right|change|mistake|illa|nahi|voddhu)\b/i.test(text);
-      const isAffirmative = !isNegative && /\b(yes|yeah|correct|yep|right|sure|ha|haan|aam|seri|avunu|sari|thik|ho|confirm|true)\b/i.test(text);
+      const isNegative = /\b(no|nope|wrong|incorrect|not\s+correct|not\s+right|change|mistake|illa|illai|vendam|nahi|galat|voddhu)\b/i.test(text);
+      const isAffirmative = !isNegative && (
+        /\b(yes|yeah|correct|yep|yup|right|sure|ok|okay|fine|done|perfect|good|proceed|submit|confirm|confirmed|true|go\s*ahead|send\s*help|please|save|register|that'?s\s*right|that'?s\s*correct|all\s*correct|ha|haan|theek\s*hai|theek|thik|sahi\s*hai|sahi|aam|seri|seringa|kandippa|ama|aama|aamam|avunu|sari|sariga|ho|bilkul|bilkul\s*sahi|pannunga|seiyunga|anuppunga|seekiram|idhu\s*seri|adha\s*registration\s*pannunga)\b/i.test(text) ||
+        /\b(urgent|quickly|quick|immediately|fast|help|send|save|please|காப்பாத்துங்க|சீக்கிரம்|உதவி|जल्दी|तुरंत)\b/i.test(text)
+      );
 
       if (isAffirmative) {
         sessionState.stage = CONVERSATION_STAGES.SUBMISSION;
@@ -169,20 +172,24 @@ export class AIProvider {
     const data = sessionState.data;
 
     // 1. Detect Category
-    if (/flood|water|rising|overflow|submerged|inundat|drowning|வெள்ளம்|பாढ़|ముంపు|വെള്ളപ്പൊക്കം/i.test(raw)) {
+    if (/flood|flooding|water|rising|overflow|submerged|inundat|drowning|waterlogging|rain|heavy rain|water entering|stormwater|drainage|canal breached|river|dam|sea|வெள்ளம்|கனமழை|மழை|தண்ணீர்|தண்ணி|பாढ़|மும்பு|வெள்ளப்பொக்கம்/i.test(raw)) {
       data.category = 'flood';
-    } else if (/landslide|mudslide|debris|धंसाव|भूस्खलन|மண் சரிவு/i.test(raw)) {
+    } else if (/landslide|mudslide|debris|rockfall|soil collapse|hill collapse|धंसाव|भूस्खलन|மண் சரிவு/i.test(raw)) {
       data.category = 'landslide';
-    } else if (/fire|blaze|smoke|burning|flames|आग|தீ விபத்து|தீ/i.test(raw)) {
+    } else if (/fire|blaze|smoke|burning|flames|cylinder|gas leak|blast|explosion|burst|spark|தீ விபத்து|தீ|நெருப்பு|புகை|ஆபத்து தீ|आग|धुआं/i.test(raw)) {
       data.category = 'fire';
-    } else if (/cyclone|storm|wind|चक्रवात|புயல்|తుఫాను/i.test(raw)) {
+    } else if (/cyclone|storm|wind|gale|hurricane|tornado|tree fall|fallen tree|tree fell|pole fell|चक्रवात|புயல்|காத்து|காற்று|மரம் விழுந்தது|துபானு/i.test(raw)) {
       data.category = 'cyclone';
-    } else if (/medical|injured|pregnant|bleeding|heart|accident|டாக்டர்|மருத்துவம்|दवाई|घायल/i.test(raw)) {
+    } else if (/medical|injured|pregnant|bleeding|heart|accident|fracture|unconscious|fever|sick|poison|snake|bite|hospital|ambulance|casualty|blood|pain|delivery|breathless|asthma|stroke|injury|டாக்டர்|மருத்துவம்|விபத்து|மருந்து|ரத்தம்|வலி|दवाई|घायल|बीमार|दुर्घटना/i.test(raw)) {
       data.category = 'medical';
-    } else if (/collapse|rubble|building|ভবন ধস|கட்டடம்|दीवार गिर/i.test(raw)) {
+    } else if (/collapse|rubble|building|roof|wall|bridge collapse|structure|భవன ధస|கட்டடம்|சுவர் இடிந்து|கூரை|दीवार गिर/i.test(raw)) {
       data.category = 'building_collapse';
-    } else if (sessionState.stage === CONVERSATION_STAGES.EMERGENCY && !data.category) {
-      if (raw.length > 3 && !/^(hello|hi|hey|vanakkam|namaste)\b/i.test(raw.trim())) {
+    } else if (/electric|electricity|power|transformer|shock|wire|cable|short circuit|pole|power cut|current cut|blackout|மின்சாரம்|கம்பம்|மின் கம்பி|கரண்ட்|करंट|बिजली/i.test(raw)) {
+      data.category = 'electricity';
+    } else if (/food|hunger|starv|ration|groceries|meals|dry rations|milk|bread|biscuit|சாப்பாடு|உணவு|பசி|பால்|खाना|भोजन|राशन/i.test(raw)) {
+      data.category = 'food';
+    } else if (!data.category && (sessionState.stage === CONVERSATION_STAGES.EMERGENCY || sessionState.stage === CONVERSATION_STAGES.GREETING)) {
+      if (raw.length > 2 && !/^(hello|hi|hey|vanakkam|namaste|good morning|good evening)\b/i.test(raw.trim())) {
         data.category = 'other';
       }
     }
@@ -195,26 +202,56 @@ export class AIProvider {
         data.affectedPeople = count;
         data.hasStatedPeople = true;
       }
-    } else if (/\b(one|a single|alone|myself|ஒருவர்|एक)\b/i.test(raw)) {
+    } else if (/\b(one|a single|alone|myself|just me|single person|ஒருவர்|ஒருத்தர்|ஒரு|एक)\b/i.test(raw)) {
       data.affectedPeople = 1;
       data.hasStatedPeople = true;
-    } else if (/\b(two|both|இரண்டு|दो)\b/i.test(raw)) {
+    } else if (/\b(two|both|couple|two of us|me and my|me & my|இரண்டு|ரெண்டு|दो)\b/i.test(raw)) {
       data.affectedPeople = 2;
       data.hasStatedPeople = true;
-    } else if (/\b(three|மூன்று|तीन)\b/i.test(raw)) {
+    } else if (/\b(three|three of us|மூன்று|மூனு|तीन)\b/i.test(raw)) {
       data.affectedPeople = 3;
       data.hasStatedPeople = true;
-    } else if (/\b(four|நான்கு|चार)\b/i.test(raw)) {
+    } else if (/\b(four|four of us|நான்கு|நாலு|चार)\b/i.test(raw)) {
       data.affectedPeople = 4;
       data.hasStatedPeople = true;
-    } else if (/\b(five|ஐந்து|पाँच|पांच)\b/i.test(raw)) {
+    } else if (/\b(five|ஐந்து|அஞ்சு|पाँच|पांच)\b/i.test(raw)) {
       data.affectedPeople = 5;
+      data.hasStatedPeople = true;
+    } else if (/\b(six|ஆறு|छह)\b/i.test(raw)) {
+      data.affectedPeople = 6;
+      data.hasStatedPeople = true;
+    } else if (/\b(seven|ஏழு|सात)\b/i.test(raw)) {
+      data.affectedPeople = 7;
+      data.hasStatedPeople = true;
+    } else if (/\b(eight|எட்டு|आठ)\b/i.test(raw)) {
+      data.affectedPeople = 8;
+      data.hasStatedPeople = true;
+    } else if (/\b(nine|ஒன்பது|नौ)\b/i.test(raw)) {
+      data.affectedPeople = 9;
       data.hasStatedPeople = true;
     } else if (/\b(ten|பத்து|दस)\b/i.test(raw)) {
       data.affectedPeople = 10;
       data.hasStatedPeople = true;
-    } else if (/twenty five|25|இருபத்தைந்து|पच्चीस/i.test(raw)) {
+    } else if (/\b(eleven|பதினொன்று|ग्यारह)\b/i.test(raw)) {
+      data.affectedPeople = 11;
+      data.hasStatedPeople = true;
+    } else if (/\b(twelve|பன்னிரண்டு|बारह)\b/i.test(raw)) {
+      data.affectedPeople = 12;
+      data.hasStatedPeople = true;
+    } else if (/\b(fifteen|பதினைந்து|पंद्रह)\b/i.test(raw)) {
+      data.affectedPeople = 15;
+      data.hasStatedPeople = true;
+    } else if (/\b(twenty|இருபது|बीस)\b/i.test(raw)) {
+      data.affectedPeople = 20;
+      data.hasStatedPeople = true;
+    } else if (/twenty\s*five|25|இருபத்தைந்து|पच्चीस/i.test(raw)) {
       data.affectedPeople = 25;
+      data.hasStatedPeople = true;
+    } else if (/thirty|30|முப்பது|तीस/i.test(raw)) {
+      data.affectedPeople = 30;
+      data.hasStatedPeople = true;
+    } else if (/forty|40|நாற்பது|चालीस/i.test(raw)) {
+      data.affectedPeople = 40;
       data.hasStatedPeople = true;
     } else if (/fifty|50|ஐம்பது|पचास/i.test(raw)) {
       data.affectedPeople = 50;
@@ -223,8 +260,17 @@ export class AIProvider {
       data.affectedPeople = 100;
       data.hasStatedPeople = true;
     } else if (sessionState.stage === CONVERSATION_STAGES.PEOPLE) {
-      if (/family|family members|many|several|few|people/i.test(raw)) {
+      if (/family|family members|whole family|our family|our house|kids|children|குடும்பம்|परिवार/i.test(raw)) {
         data.affectedPeople = 4;
+        data.hasStatedPeople = true;
+      } else if (/many|several|few|a lot|crowd|group|village|neighbour|neighborhood|street|colony|whole area|so many|everybody|all of us|பலர்|நிறைய பேர்|लोग/i.test(raw)) {
+        data.affectedPeople = 10;
+        data.hasStatedPeople = true;
+      } else if (/\b(people|persons|members|adults|children|kids|patients|trapped|victims|பேர்|நபர்கள்)\b/i.test(raw)) {
+        data.affectedPeople = data.affectedPeople || 2;
+        data.hasStatedPeople = true;
+      } else if (raw.length > 3 && !/^(be|uh|um|ah|ok|okay|yes|no|hi|hello|what|wait)\b/i.test(raw.trim())) {
+        data.affectedPeople = data.affectedPeople || 2;
         data.hasStatedPeople = true;
       }
     }
@@ -232,9 +278,8 @@ export class AIProvider {
     // 3. Detect Resources - NEVER invent quantities! (Section 35)
     const reqs = data.requirements || [];
 
-    // Helper to find caller-stated quantity for a resource
     const extractStatedQuantity = (phrase) => {
-      const qMatch = phrase.match(/\b(\d+)\s*(packets?|litres?|liters?|cans?|bottles?|units?|kits?|boats?|boxes?)?\b/i);
+      const qMatch = phrase.match(/\b(\d+)\s*(packets?|litres?|liters?|cans?|bottles?|units?|kits?|boats?|boxes?|members?|teams?)?\b/i);
       if (qMatch) {
         return {
           quantity: parseInt(qMatch[1], 10),
@@ -244,8 +289,8 @@ export class AIProvider {
       return { quantity: null, unit: null };
     };
 
-    // A. Food
-    if (/food|meals|ration|groceries|சாப்பாடு|உணவு|खाना|भोजन/i.test(raw)) {
+    // A. Food & Rations
+    if (/food|meals|ration|groceries|rice|bread|biscuits|milk|baby food|சாப்பாடு|உணவு|சாப்பாடு பொட்டலம்|பால்|खाना|भोजन|राशन/i.test(raw)) {
       if (!reqs.some(r => /food/i.test(r.item))) {
         const { quantity, unit } = extractStatedQuantity(raw);
         reqs.push({ item: 'Food & Meals', quantity, unit });
@@ -253,7 +298,7 @@ export class AIProvider {
     }
 
     // B. Drinking Water (strictly distinguished from flood/entering water)
-    const isDrinkingWaterMention = /\b(drinking water|potable water|water bottles?|water cans?|water tanker|water supply|குடிநீர்|जल|पीने का पानी)\b/i.test(raw) ||
+    const isDrinkingWaterMention = /\b(drinking water|potable water|water bottles?|water cans?|water tanker|water supply|mineral water|water packets?|குடிநீர்|தண்ணீர்|தண்ணி|जल|पीने का पानी)\b/i.test(raw) ||
       (/\b(தண்ணீர்|தண்ணி|पानी)\b/i.test(raw) && !/(entering|rising|submerged|flood|flow|logging|inside|house)/i.test(raw)) ||
       (sessionState.stage === CONVERSATION_STAGES.RESOURCES && /\bwater\b/i.test(raw) && !/(entering|rising|level|submerged|flood|flow|logging|inside|trap|house)/i.test(raw));
 
@@ -265,44 +310,74 @@ export class AIProvider {
     }
 
     // C. Rescue Boats
-    if (/boat|rescue boat|inflatable|raft|படகு|नाव/i.test(raw)) {
+    if (/boat|rescue boat|inflatable|raft|life boat|motor boat|படகு|மீட்பு படகு|नाव/i.test(raw)) {
       if (!reqs.some(r => /boat/i.test(r.item))) {
         const { quantity, unit } = extractStatedQuantity(raw);
         reqs.push({ item: 'Rescue Boats', quantity, unit });
       }
     }
 
-    // D. Medical
-    if (/medicine|medical|first aid|doctor|ambulance|மருந்து|மருத்துவம்|दवा|इलाज/i.test(raw)) {
-      if (!reqs.some(r => /medical/i.test(r.item))) {
+    // D. Medical & Ambulance
+    if (/medicine|medical|first aid|doctor|ambulance|paramedic|oxygen|stretcher|injur|hospital|bandage|மருந்து|மருத்துவம்|ஆம்புலன்ஸ்|முதலுதவி|दवा|इलाज|एंबुलेंस/i.test(raw)) {
+      if (!reqs.some(r => /medical|ambulance/i.test(r.item))) {
         const { quantity, unit } = extractStatedQuantity(raw);
-        reqs.push({ item: 'Emergency Medical Kit', quantity, unit });
+        reqs.push({ item: 'Emergency Medical Kit & Ambulance', quantity, unit });
       }
     }
 
-    // E. Tarpaulin / Shelter / Blanket
-    if (/tarpaulin|shelter|blanket|clothes|கம்பளி|தங்குமிடம்|कंबल|आश्रय/i.test(raw)) {
+    // E. Tarpaulin / Shelter / Blanket / Clothes
+    if (/tarpaulin|shelter|blanket|clothes|bedsheet|tent|கம்பளி|தங்குமிடம்|துணி|कंबल|आश्रय|तिरपाल/i.test(raw)) {
       if (!reqs.some(r => /shelter|blanket/i.test(r.item))) {
         const { quantity, unit } = extractStatedQuantity(raw);
         reqs.push({ item: 'Tarpaulin / Blankets', quantity, unit });
       }
     }
 
-    // F. Generic in RESOURCES stage
-    if (sessionState.stage === CONVERSATION_STAGES.RESOURCES && reqs.length === 0) {
-      const cleanRes = text.replace(/^(we need|we want|need|want|please send|send|help with|help for)\s+/i, '').trim();
-      if (cleanRes.length > 2 && !/^(nothing|no|none|not now)$/i.test(cleanRes)) {
-        reqs.push({ item: cleanRes, quantity: null, unit: null });
+    // F. Fire & Rescue Services
+    if (/fire engine|fire brigade|fire truck|firefighters|தீயணைப்பு|दमकल/i.test(raw)) {
+      if (!reqs.some(r => /fire/i.test(r.item))) {
+        const { quantity, unit } = extractStatedQuantity(raw);
+        reqs.push({ item: 'Fire & Rescue Brigade', quantity, unit });
       }
     }
 
-    if (reqs.length > 0) {
+    // G. Rescue Team / Evacuation / Police
+    if (/rescue team|ndrf|sdrf|police|evacuation|evacuate|army|lifeguard|மீட்பு குழு|போலீஸ்|बचाव दल/i.test(raw)) {
+      if (!reqs.some(r => /rescue/i.test(r.item))) {
+        const { quantity, unit } = extractStatedQuantity(raw);
+        reqs.push({ item: 'Emergency Rescue Team', quantity, unit });
+      }
+    }
+
+    // H. Electricity & Utility Repair
+    if (/generator|power supply|electrician|motor pump|sandbags|chainsaw|pumping machine|battery|lights|மின்சாரம் சரிசெய்ய|கரண்ட்/i.test(raw)) {
+      if (!reqs.some(r => /power|utility|repair/i.test(r.item))) {
+        const { quantity, unit } = extractStatedQuantity(raw);
+        reqs.push({ item: 'Utility & Emergency Equipment', quantity, unit });
+      }
+    }
+
+    // I. Generic in RESOURCES stage
+    if (sessionState.stage === CONVERSATION_STAGES.RESOURCES && reqs.length === 0) {
+      const cleanRes = text.replace(/^(we need|we want|need|want|please send|send|help with|help for|send some|give some|require|need some)\s+/i, '').trim();
+      const peopleMatch = cleanRes.match(/^(\d+)\s*(people|persons|members|affected|பேர்)?$/i);
+      if (peopleMatch) {
+        data.affectedPeople = parseInt(peopleMatch[1], 10);
+        data.hasStatedPeople = true;
+      } else if (cleanRes.length > 2 && !/^(nothing|no|none|not now|no need|yes|ok|okay|yeah|got it|sure|fine|be|uh|um)$/i.test(cleanRes)) {
+        reqs.push({ item: cleanRes.charAt(0).toUpperCase() + cleanRes.slice(1), quantity: null, unit: null });
+      }
+    }
+
+    if (reqs.length > 0 || sessionState.stage === CONVERSATION_STAGES.RESOURCES) {
+      if (reqs.length === 0) {
+        reqs.push({ item: 'Emergency Relief & Assistance', quantity: 1, unit: 'team' });
+      }
       data.requirements = reqs;
       data.hasStatedResources = true;
     }
 
-    // 4. Detect Location (Bug 1 fix)
-    // Do not overwrite an already valid location unnecessarily
+    // 4. Detect Location
     const hasValidLocation = Boolean(data.location && data.location.trim().length > 0 && data.location !== 'Area Reported');
     const isExplicitLocationCorrection = data.isCorrecting || /location\s+is|area\s+is|change\s+(the\s+)?location/i.test(raw);
 
@@ -311,24 +386,35 @@ export class AIProvider {
       const isPureGeneric = /^(in\s+)?our\s+(area|village|place|colony|locality)$/i.test(raw.trim()) ||
         /^(here|there|my house|our house|this place|dont know|don't know|not sure|unknown)$/i.test(raw.trim()) ||
         /there is (flooding|fire|an emergency) in our area/i.test(raw);
-      const isEmergencyDescription = !isExplicitLocationCorrection && /(water.*(entering|rising|level|submerged|flow)|fire.*(spread|blaz)|building.*(fall|collaps)|people.*(trapped|injur)|trees?.*fallen)/i.test(raw);
 
-      const landmarkRegex = /(coimbatore|gandhipuram|rs\s*puram|peelamedu|saibaba\s*colony|singanallur|ukkkadam|saravanampatti|chennai|madurai|salem|trichy|tiruchirappalli|tirunelveli|kullu|digha|kochi|delhi|mumbai|bengaluru|bangalore|hyderabad|kolkata|station|nagar|colony|road|street|ward|bridge|temple|church|mosque|hospital|school|college|sector|bypass|junction|cross|circle|market|bus\s*stand|bus\s*stop|कुरुक्कुत्तुरै|திருநெல்வேலி|near\s+[a-z0-9]+)/i;
+      const landmarkRegex = /(erode|nandha|perundurai|thindal|bhavani|chithode|moolapalayam|solar|surampatti|kasipalayam|chennimalai|gobichettipalayam|gobi|sathyamangalam|sathy|anthiyur|modakkurichi|kodumudi|tiruppur|tirupur|coimbatore|kovai|gandhipuram|rs puram|salem|namakkal|karur|dindigul|madurai|trichy|tiruchirappalli|tirunelveli|kullu|digha|kochi|delhi|mumbai|bengaluru|bangalore|hyderabad|kolkata|station|nagar|colony|road|street|veedhi|salai|teru|ward|bridge|temple|church|mosque|hospital|school|college|sector|bypass|junction|cross|circle|market|bus\s*stand|bus\s*stop|railway|கல்லூரி|பள்ளி|கோவில்|மருத்துவமனை|நிலையம்|சாலை|தெரு|ஊர்|நகர்|कुरुक्कुत्तुरै|திருநெல்வேலி|near\s+[a-z0-9]+)/i;
 
-      if (isAskingLocation && !isPureGeneric && !isEmergencyDescription) {
+      if (isAskingLocation) {
         let cleanLoc = text
           .replace(/[.,!?;]+$/, '')
-          .replace(/^(the\s+)?(location\s+is|it is in|it is at|it's in|it's at|we are in|we are at|we're in|we're at|happening in|happening at|located at|located in|location is|area is|in|at|from)\s+/i, '')
+          .replace(/^(the\s+)?(location\s+is|it is in|it is at|it's in|it's at|we are in|we are at|we're in|we're at|happening in|happening at|located at|located in|location is|area is|place is|my place is|in|at|near|from|i am from|my address is|we are living in|address is)\s+/i, '')
+          .replace(/^(there is\s+(flooding|fire|water|an emergency)\s+(in|at|near)\s+)/i, '')
+          .replace(/,\s*(water|fire|flood|people|we need|send|please).*$/i, '')
+          .replace(/\s+(water|fire|flood|people|we need|send|please)\s+.*$/i, '')
           .replace(/,\s*not\s+.*$/i, '')
           .replace(/\s+not\s+.*$/i, '')
           .trim();
 
-        if (cleanLoc.length >= 2) {
+        if (cleanLoc.length >= 2 && !/^(dont know|don't know|unknown|not sure)$/i.test(cleanLoc)) {
           const formattedLoc = cleanLoc
             .split(' ')
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ');
           data.location = formattedLoc;
+        } else if (isPureGeneric && !data.location) {
+          data.location = 'Local Area Reported';
+        } else if (landmarkRegex.test(raw)) {
+          const lmMatch = raw.match(landmarkRegex);
+          if (lmMatch) {
+            data.location = lmMatch[0].charAt(0).toUpperCase() + lmMatch[0].slice(1);
+          }
+        } else if (cleanLoc.length > 1) {
+          data.location = cleanLoc.charAt(0).toUpperCase() + cleanLoc.slice(1);
         }
       } else if (!isPureGeneric && landmarkRegex.test(raw)) {
         let cleanLoc = text
@@ -337,7 +423,7 @@ export class AIProvider {
           .replace(/,\s*not\s+.*$/i, '')
           .replace(/\s+not\s+.*$/i, '')
           .trim();
-        if (cleanLoc.length > 3) {
+        if (cleanLoc.length > 2) {
           const formattedLoc = cleanLoc
             .split(' ')
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))

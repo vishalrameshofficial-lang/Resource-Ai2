@@ -252,7 +252,7 @@ export const api = {
       headers: getAuthHeaders()
     });
     const json = await res.json();
-    return json;
+    return json.data || [];
   },
 
   async getEducationRequestById(id: string) {
@@ -482,6 +482,78 @@ export const api = {
       headers: getAuthHeaders()
     });
     return res.json();
+  },
+
+  // ─────────────────────────────────────────────
+  // Complaint Dispatch (Auto-forwarding to departments)
+  // ─────────────────────────────────────────────
+
+  async getComplaintDispatches(filters: Record<string, string> = {}) {
+    const query = new URLSearchParams(filters).toString();
+    const res = await fetch(`${API_BASE}/complaint-dispatch${query ? `?${query}` : ''}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async getComplaintDispatchStats() {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/stats`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getComplaintDispatchById(id: string) {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/${id}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getComplaintDispatchesByCallId(callId: string) {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/call/${callId}`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async acknowledgeComplaintDispatch(id: string) {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/${id}/acknowledge`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async resolveComplaintDispatch(id: string, resolutionNotes?: string) {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/${id}/resolve`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ resolutionNotes })
+    });
+    const json = await res.json();
+    return json.data;
+  },
+
+  async manualDispatchComplaint(callId: string) {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/manual`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ callId })
+    });
+    const json = await res.json();
+    return json;
+  },
+
+  async getDepartmentRegistry() {
+    const res = await fetch(`${API_BASE}/complaint-dispatch/registry`);
+    const json = await res.json();
+    return json.data || [];
   }
 };
 

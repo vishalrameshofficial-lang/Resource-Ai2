@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { CommandCenterStats } from '../../types/operations';
+import { Activity, Shield, GraduationCap, HeartPulse, MapPin, FileText, Radio, Server, CheckCircle2 } from 'lucide-react';
 
 interface CommandCenterViewProps {
   onNavigateTab: (tab: string) => void;
@@ -34,8 +35,8 @@ export function CommandCenterView({ onNavigateTab }: CommandCenterViewProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center space-y-3">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-medium">Synchronizing Command Center...</span>
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-slate-500 font-medium">Synchronizing Command Center...</span>
         </div>
       </div>
     );
@@ -95,16 +96,16 @@ export function CommandCenterView({ onNavigateTab }: CommandCenterViewProps) {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Platform Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 shadow-xl relative overflow-hidden">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-50/90 via-white/95 to-cyan-50/90 border border-slate-200/90 shadow-lg shadow-blue-900/5 relative overflow-hidden glass-panel-3d">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
-              <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider font-mono">GOVERNMENT OPERATIONS PLATFORM</span>
+              <span className="text-[11px] font-extrabold text-blue-700 uppercase tracking-wider font-mono">GOVERNMENT OPERATIONS PLATFORM</span>
               <span className="text-[10px] text-slate-500 font-mono">| TRI-DOMAIN INTEGRATED DISPATCH</span>
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">State & District Central Command Center</h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">State & District Central Command Center</h1>
+            <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed font-medium">
               Unified digital operations console coordinating Emergency Disaster Dispatch, Education Resource Allocation, and Healthcare Material Governance. Real database telemetry with zero simulation.
             </p>
           </div>
@@ -112,22 +113,24 @@ export function CommandCenterView({ onNavigateTab }: CommandCenterViewProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => onNavigateTab('map')}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
             >
-              <span>🗺️</span> Operations Map
+              <MapPin className="w-4 h-4" />
+              <span>Operations Map</span>
             </button>
             <button
-              onClick={() => onNavigateTab('audit')}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+              onClick={() => onNavigateTab('audit-logs')}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-all flex items-center gap-1.5"
             >
-              <span>📜</span> Audit Trail
+              <FileText className="w-4 h-4 text-blue-600" />
+              <span>Audit Trail</span>
             </button>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-semibold flex items-center gap-2 shadow-2xs">
           <span>⚠️</span> {error}
         </div>
       )}
@@ -135,256 +138,235 @@ export function CommandCenterView({ onNavigateTab }: CommandCenterViewProps) {
       {/* ── THREE OPERATIONAL DOMAINS CARDS ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* DOMAIN 1: EMERGENCY RESPONSE */}
-        <div className="rounded-2xl border border-red-500/20 bg-gradient-to-b from-red-950/20 via-slate-900/60 to-slate-950 p-5 shadow-xl flex flex-col justify-between relative group hover:border-red-500/40 transition-all">
+        <div className="rounded-2xl border border-rose-200 bg-white/90 p-5 shadow-lg flex flex-col justify-between relative group hover:border-rose-300 transition-all glass-card-3d">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-lg">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center font-bold">
                   🚨
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-white">Emergency Response</h3>
-                  <p className="text-[10px] text-slate-400">Exotel Telephony & AI Voicebot</p>
+                  <h3 className="text-sm font-extrabold text-slate-900">Emergency Response</h3>
+                  <p className="text-[10px] text-slate-500 font-medium">Exotel Telephony & AI Voicebot</p>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
                 {em.activeCalls > 0 ? `${em.activeCalls} Live Calls` : 'Standby'}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 mb-4">
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-white">{em.totalIncidents}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Total Incidents</div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xl font-black text-slate-900">{em.totalIncidents}</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Total Incidents</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-red-400">{em.criticalIncidents}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Critical Severity</div>
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                <div className="text-xl font-black text-rose-600">{em.criticalIncidents}</div>
+                <div className="text-[10px] text-rose-700 font-bold uppercase tracking-wider mt-0.5">Critical Severity</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-amber-400">{em.pendingVerification}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Verification Req.</div>
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                <div className="text-xl font-black text-amber-600">{em.pendingVerification}</div>
+                <div className="text-[10px] text-amber-700 font-bold uppercase tracking-wider mt-0.5">Verification Req.</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-emerald-400">{em.resolved}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Resolved</div>
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div className="text-xl font-black text-emerald-600">{em.resolved}</div>
+                <div className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider mt-0.5">Resolved</div>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 space-y-1.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800/50 mb-4">
+            <div className="text-[11px] text-slate-600 font-medium space-y-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4">
               <div className="flex justify-between">
                 <span>Total Calls Recorded:</span>
-                <span className="font-bold text-slate-200">{em.totalCalls}</span>
+                <span className="font-bold text-slate-900">{em.totalCalls}</span>
               </div>
               <div className="flex justify-between">
                 <span>Active Field Incidents:</span>
-                <span className="font-bold text-blue-400">{em.activeIncidents}</span>
+                <span className="font-bold text-blue-600">{em.activeIncidents}</span>
               </div>
               <div className="flex justify-between">
                 <span>Dispatches In Progress:</span>
-                <span className="font-bold text-orange-400">{em.assigned}</span>
+                <span className="font-bold text-orange-600">{em.assigned}</span>
               </div>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigateTab('emergency')}
-            className="w-full py-2.5 rounded-xl text-xs font-bold bg-red-600/20 text-red-300 border border-red-500/30 hover:bg-red-600/30 transition-all flex items-center justify-center gap-1.5"
+            onClick={() => onNavigateTab('dashboard')}
+            className="w-full py-2.5 rounded-xl text-xs font-extrabold bg-rose-100 text-rose-800 border border-rose-200 hover:bg-rose-200 transition-all flex items-center justify-center gap-1.5 shadow-2xs"
           >
             <span>🚨</span> Open Emergency Dispatch &rarr;
           </button>
         </div>
 
         {/* DOMAIN 2: EDUCATION RESOURCE ALLOCATION */}
-        <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-b from-blue-950/20 via-slate-900/60 to-slate-950 p-5 shadow-xl flex flex-col justify-between relative group hover:border-blue-500/40 transition-all">
+        <div className="rounded-2xl border border-blue-200 bg-white/90 p-5 shadow-lg flex flex-col justify-between relative group hover:border-blue-300 transition-all glass-card-3d">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-lg">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 border border-blue-200 text-blue-700 flex items-center justify-center font-bold">
                   🎓
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-white">Education Allocation</h3>
-                  <p className="text-[10px] text-slate-400">Manual Government Petitions</p>
+                  <h3 className="text-sm font-extrabold text-slate-900">Education Resources</h3>
+                  <p className="text-[10px] text-slate-500 font-medium">Material & Facility Management</p>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                {edu.totalRequests > 0 ? `${edu.totalRequests} Petitions` : 'Zero Petitions'}
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                {edu.totalRequests} Requests
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 mb-4">
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-white">{edu.totalRequests}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Total Requests</div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xl font-black text-slate-900">{edu.institutionsCount}</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5 font-medium">Institutions</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-amber-400">{edu.underReview}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Under Review</div>
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-200">
+                <div className="text-xl font-black text-blue-600">{edu.openRequests}</div>
+                <div className="text-[10px] text-blue-700 font-bold uppercase tracking-wider mt-0.5">Open Demands</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-emerald-400">{edu.approved}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Approved Orders</div>
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-200">
+                <div className="text-xl font-black text-indigo-600">{edu.pendingAllocation}</div>
+                <div className="text-[10px] text-indigo-700 font-bold uppercase tracking-wider mt-0.5">Pending Alloc.</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-cyan-400">{edu.allocated}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Allocated</div>
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div className="text-xl font-black text-emerald-600">{edu.delivered}</div>
+                <div className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider mt-0.5">Delivered</div>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 space-y-1.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800/50 mb-4">
+            <div className="text-[11px] text-slate-600 font-medium space-y-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4">
               <div className="flex justify-between">
-                <span>Registered Institutions:</span>
-                <span className="font-bold text-slate-200">{edu.institutionsCount}</span>
+                <span>Cataloged Supplies:</span>
+                <span className="font-bold text-slate-900">{edu.inventoryCount}</span>
               </div>
               <div className="flex justify-between">
-                <span>Inventory Items Tracked:</span>
-                <span className="font-bold text-blue-400">{edu.inventoryCount}</span>
+                <span>Verified Requisitions:</span>
+                <span className="font-bold text-blue-600">{edu.verified}</span>
               </div>
               <div className="flex justify-between">
-                <span>Completed Deliveries:</span>
-                <span className="font-bold text-emerald-400">{edu.delivered + edu.closed}</span>
+                <span>Active Dispatch Orders:</span>
+                <span className="font-bold text-indigo-600">{edu.allocationsCount}</span>
               </div>
             </div>
           </div>
 
           <button
             onClick={() => onNavigateTab('education')}
-            className="w-full py-2.5 rounded-xl text-xs font-bold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 rounded-xl text-xs font-extrabold bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-all flex items-center justify-center gap-1.5 shadow-2xs"
           >
             <span>🎓</span> Open Education Portal &rarr;
           </button>
         </div>
 
-        {/* DOMAIN 3: HEALTH RESOURCE ALLOCATION */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-950/20 via-slate-900/60 to-slate-950 p-5 shadow-xl flex flex-col justify-between relative group hover:border-emerald-500/40 transition-all">
+        {/* DOMAIN 3: HEALTHCARE & HOSPITAL LOGISTICS */}
+        <div className="rounded-2xl border border-emerald-200 bg-white/90 p-5 shadow-lg flex flex-col justify-between relative group hover:border-emerald-300 transition-all glass-card-3d">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-lg">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold">
                   🏥
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-white">Health Allocation</h3>
-                  <p className="text-[10px] text-slate-400">Medicines, ICU Beds, Equipment</p>
+                  <h3 className="text-sm font-extrabold text-slate-900">Health Resources</h3>
+                  <p className="text-[10px] text-slate-500 font-medium">Hospital & ICU Medical Supplies</p>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {hlt.totalRequests > 0 ? `${hlt.totalRequests} Petitions` : 'Zero Petitions'}
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                {hlt.totalRequests} Demands
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 mb-4">
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-white">{hlt.totalRequests}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Total Requests</div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xl font-black text-slate-900">{hlt.facilitiesCount}</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Facilities</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-amber-400">{hlt.underReview}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Under Review</div>
+              <div className="p-3 rounded-xl bg-teal-50 border border-teal-200">
+                <div className="text-xl font-black text-teal-600">{hlt.openRequests}</div>
+                <div className="text-[10px] text-teal-700 font-bold uppercase tracking-wider mt-0.5">Open Demands</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-emerald-400">{hlt.approved}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Approved Orders</div>
+              <div className="p-3 rounded-xl bg-cyan-50 border border-cyan-200">
+                <div className="text-xl font-black text-cyan-600">{hlt.pendingAllocation}</div>
+                <div className="text-[10px] text-cyan-700 font-bold uppercase tracking-wider mt-0.5">Pending Dispatch</div>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                <div className="text-xl font-black text-cyan-400">{hlt.allocated}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Allocated</div>
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div className="text-xl font-black text-emerald-600">{hlt.delivered}</div>
+                <div className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider mt-0.5">Fulfillments</div>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 space-y-1.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800/50 mb-4">
+            <div className="text-[11px] text-slate-600 font-medium space-y-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4">
               <div className="flex justify-between">
-                <span>Registered Facilities:</span>
-                <span className="font-bold text-slate-200">{hlt.facilitiesCount}</span>
+                <span>Medical Supplies Stock:</span>
+                <span className="font-bold text-slate-900">{hlt.inventoryCount}</span>
               </div>
               <div className="flex justify-between">
-                <span>Medical Stock Types:</span>
-                <span className="font-bold text-emerald-400">{hlt.inventoryCount}</span>
+                <span>Verified Clinical Orders:</span>
+                <span className="font-bold text-teal-600">{hlt.verified}</span>
               </div>
               <div className="flex justify-between">
-                <span>Completed Deliveries:</span>
-                <span className="font-bold text-cyan-400">{hlt.delivered + hlt.closed}</span>
+                <span>Completed Logistics:</span>
+                <span className="font-bold text-emerald-600">{hlt.closed}</span>
               </div>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigateTab('health')}
-            className="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-600/30 transition-all flex items-center justify-center gap-1.5"
+            onClick={() => onNavigateTab('health-resources')}
+            className="w-full py-2.5 rounded-xl text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 hover:bg-emerald-200 transition-all flex items-center justify-center gap-1.5 shadow-2xs"
           >
-            <span>🏥</span> Open Health Portal &rarr;
+            <span>🏥</span> Open Healthcare Portal &rarr;
           </button>
         </div>
       </div>
 
-      {/* ── PLATFORM SUBSYSTEM INTEGRITY STATUS ── */}
-      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md">
-        <div className="flex items-center justify-between mb-4">
+      {/* SUBSYSTEM INTEGRATION STATUS BAR */}
+      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm glass-panel-3d">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-extrabold text-white">Subsystem Verification Matrix</span>
-            <span className="text-[10px] text-slate-500 font-mono">LIVE CHECKS</span>
+            <Server className="w-4 h-4 text-blue-600" />
+            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Subsystem Integration Health</h4>
           </div>
-          <span className="text-[11px] text-slate-400 font-mono">
-            Exotel Number: <strong className="text-blue-400 font-mono">{sub.virtualNumber}</strong>
+          <span className="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            ALL SYSTEMS OPERATIONAL
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Exotel Telephony</div>
-            <div className="font-black text-emerald-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              {sub.exotel}
-            </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs font-semibold">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">Telephony</div>
+            <div className="text-slate-900 font-bold mt-0.5">{sub.exotel}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Voice WebSocket</div>
-            <div className="font-black text-emerald-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              {sub.voiceWebSocket}
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">Virtual Helpline</div>
+            <div className="text-emerald-600 font-mono font-bold mt-0.5">{sub.virtualNumber}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Whisper STT</div>
-            <div className="font-black text-blue-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-blue-400" />
-              {sub.sttProvider}
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">Voice Stream</div>
+            <div className="text-cyan-600 font-bold mt-0.5">{sub.voiceWebSocket}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">AI Intelligence</div>
-            <div className="font-black text-purple-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-purple-400" />
-              {sub.aiProvider}
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">Database</div>
+            <div className="text-emerald-600 font-bold mt-0.5">{sub.database}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Speech Synthesizer</div>
-            <div className="font-black text-amber-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-              {sub.ttsProvider}
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">Whisper STT</div>
+            <div className="text-blue-600 font-bold mt-0.5">{sub.sttProvider}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">SQLite Database</div>
-            <div className="font-black text-emerald-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              {sub.database}
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">AI Provider</div>
+            <div className="text-indigo-600 font-bold mt-0.5">{sub.aiProvider}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Operations Map</div>
-            <div className="font-black text-emerald-400 mt-1 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              READY
-            </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <div className="text-[10px] text-slate-500 uppercase">TTS Voice</div>
+            <div className="text-teal-600 font-bold mt-0.5">{sub.ttsProvider}</div>
           </div>
         </div>
       </div>

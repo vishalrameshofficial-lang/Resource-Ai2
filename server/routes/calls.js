@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { callService } from '../services/callService.js';
 import { authenticate, optionalAuthenticate } from '../middleware/auth.js';
 import { sanitizeObject } from '../middleware/security.js';
+import { complaintDispatchService } from '../services/complaintDispatchService.js';
 
 const router = Router();
 
@@ -170,6 +171,34 @@ router.post('/:id/analyze', optionalAuthenticate, async (req, res, next) => {
 
     callService.saveCallSession(updatedCall);
 
+    // Auto-dispatch complaint to nearest relevant department
+    let dispatchResult = null;
+    try {
+      dispatchResult = complaintDispatchService.dispatchComplaint({
+        callId: call.id,
+        callSid: call.call_sid,
+        requestId: call.request_id,
+        callerPhone: call.caller_phone,
+        department: classification.department,
+        priority: classification.priority,
+        location: classification.location,
+        affectedPeople: classification.affected_people,
+        summary: classification.summary,
+        query: classification.query,
+        requiredService: classification.required_service,
+        requiredResources: classification.required_resources,
+        transcript: call.transcript,
+        language: call.language,
+        confidence: classification.confidence
+      });
+
+      if (dispatchResult) {
+        console.log(`[CallsRoute] Complaint auto-dispatched: ${dispatchResult.dispatchId} → ${dispatchResult.department}`);
+      }
+    } catch (dispatchErr) {
+      console.warn('[CallsRoute] Complaint auto-dispatch notice:', dispatchErr.message);
+    }
+
     // Return exact schema required by assignment
     res.json({
       query: classification.query,
@@ -180,7 +209,8 @@ router.post('/:id/analyze', optionalAuthenticate, async (req, res, next) => {
       priority: classification.priority,
       location: classification.location,
       affected_people: classification.affected_people,
-      confidence: classification.confidence
+      confidence: classification.confidence,
+      dispatch: dispatchResult
     });
   } catch (err) {
     next(err);

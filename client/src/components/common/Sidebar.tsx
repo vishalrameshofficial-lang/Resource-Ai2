@@ -6,12 +6,10 @@ import {
   MapPin,
   Building2,
   FileText,
-  Settings,
-  Radio,
   GraduationCap,
   HeartPulse,
   FileSpreadsheet,
-  ShieldCheck
+  Siren
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,7 +27,7 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
       label: 'Emergency Response',
       icon: AlertTriangle,
       badge: newRequestsCount > 0 ? newRequestsCount : undefined,
-      badgeColor: 'bg-red-500'
+      badgeColor: 'bg-rose-500'
     },
     { id: 'education', label: 'Education Resources', icon: GraduationCap },
     { id: 'health-resources', label: 'Health Resources', icon: HeartPulse }
@@ -41,7 +39,7 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
       label: 'Incident Queue',
       icon: AlertTriangle,
       badge: newRequestsCount > 0 ? newRequestsCount : undefined,
-      badgeColor: 'bg-red-500'
+      badgeColor: 'bg-rose-500'
     },
     {
       id: 'calls',
@@ -51,15 +49,13 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
       badgeColor: 'bg-cyan-500 animate-pulse'
     },
     { id: 'dispatch', label: 'Relief Dispatch', icon: Building2 },
+    { id: 'complaint-dispatch', label: 'Complaint Dispatch', icon: Siren },
     { id: 'map', label: 'Operations Map', icon: MapPin }
   ];
 
   const platformNav = [
     { id: 'reports', label: 'Official Reports', icon: FileSpreadsheet },
-    { id: 'audit-logs', label: 'Audit Trail', icon: ShieldCheck },
-    { id: 'simulator', label: 'Exotel Telephony', icon: Radio },
-    { id: 'citizen', label: 'Citizen Portal', icon: FileText },
-    { id: 'settings', label: 'System Health', icon: Settings }
+    { id: 'citizen', label: 'Citizen Portal', icon: FileText }
   ];
 
   const renderNavGroup = (items: typeof domainNav) => (
@@ -71,19 +67,19 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
               isActive
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-500/20 translate-x-1'
+                : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80 hover:translate-x-0.5'
             }`}
           >
             <div className="flex items-center space-x-2.5">
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
               <span>{item.label}</span>
             </div>
             {item.badge !== undefined && (
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold text-white ${item.badgeColor}`}
+                className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold text-white shadow-xs ${item.badgeColor}`}
               >
                 {item.badge}
               </span>
@@ -95,11 +91,11 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
   );
 
   return (
-    <aside className="w-60 border-r border-slate-800/80 bg-slate-950/70 backdrop-blur-md flex flex-col justify-between p-3.5 shrink-0 min-h-[calc(100vh-100px)]">
+    <aside className="w-60 border-r border-slate-200/80 bg-white/80 backdrop-blur-xl flex flex-col justify-between p-3.5 shrink-0 min-h-[calc(100vh-100px)] shadow-sm">
       <div className="space-y-5">
         {/* Operational Domains */}
         <div>
-          <p className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5">
+          <p className="px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
             Operational Domains
           </p>
           {renderNavGroup(domainNav)}
@@ -107,7 +103,7 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
 
         {/* Emergency Response Sub-modules */}
         <div>
-          <p className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5">
+          <p className="px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
             Emergency Operations
           </p>
           {renderNavGroup(emergencyNav)}
@@ -115,30 +111,13 @@ export function Sidebar({ activeTab, setActiveTab, liveCallsCount, newRequestsCo
 
         {/* Governance & System Tools */}
         <div>
-          <p className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5">
+          <p className="px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
             Governance & System
           </p>
           {renderNavGroup(platformNav)}
         </div>
       </div>
 
-      {/* Telephony Connection Status Card */}
-      <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1.5">
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-          <span className="flex items-center space-x-1.5">
-            <Radio className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Exotel Telephony</span>
-          </span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        </div>
-        <p className="text-[10px] text-slate-400">
-          AgentStream WebSocket on port 5055.
-        </p>
-        <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-800/60 font-mono">
-          <span className="text-slate-400">Helpline:</span>
-          <span className="text-emerald-400 font-bold">+91 44 4761 5477</span>
-        </div>
-      </div>
     </aside>
   );
 }
